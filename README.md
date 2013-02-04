@@ -17,7 +17,7 @@ NB : You have to use Maven 3 and Java 6 (you can 'source' env.sh for that)
 
 I did not find any simple way to host the update site on GitHub.
 
-XXX
+https://qa.nuxeo.org/jenkins/job/nuxeo-mule-connector-master/ws/target/update-site/
 
 
 

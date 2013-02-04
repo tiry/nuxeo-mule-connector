@@ -248,9 +248,11 @@ public class NuxeoConnector {
     String docType, @Placement(group = "operation parameters")
     @FriendlyName("Name of the Document")
     String docName, @Placement(group = "operation parameters")
-    PropertyMap properties) throws Exception {
+    Map<String, Object> properties) throws Exception {
+
+        PropertyMap map = new PropertyMap(properties);
         return docService.createDocument(new DocRef(parentRef), docType,
-                docName, properties);
+                docName, map);
     }
 
     /**
@@ -495,8 +497,8 @@ public class NuxeoConnector {
     @Processor
     public Document update(@Placement(group = "operation parameters")
     String doc, @Placement(group = "operation parameters")
-    PropertyMap properties) throws Exception {
-        return docService.update(new DocRef(doc), properties);
+    Map<String, Object> properties) throws Exception {
+        return docService.update(new DocRef(doc), new PropertyMap(properties));
     }
 
     /**
@@ -724,7 +726,6 @@ public class NuxeoConnector {
                 }
             }
         }
-
         return request.execute();
     }
 
