@@ -3,10 +3,14 @@
  */
 package org.nuxeo.mule;
 
+import java.io.File;
+import java.util.Map;
+
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.lifecycle.Start;
@@ -14,6 +18,7 @@ import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.nuxeo.ecm.automation.client.AutomationClient;
+import org.nuxeo.ecm.automation.client.OperationRequest;
 import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
@@ -21,6 +26,8 @@ import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
 import org.nuxeo.ecm.automation.client.model.FileBlob;
+import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
+import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.PropertyMap;
 
 /**
@@ -52,14 +59,14 @@ public class NuxeoConnector {
      */
     @Configurable
     @Placement(group = "Connection")
-    private String serverName = "localhost";
+    private String serverName;
 
     /**
      * Port used to connect to Nuxeo Server
      */
     @Configurable
     @Placement(group = "Connection")
-    private String port = "8080";
+    private String port;
 
     /**
      * Context Path for Nuxeo instance
@@ -67,6 +74,14 @@ public class NuxeoConnector {
     @Configurable
     @Placement(group = "Connection")
     private String contextPath = "nuxeo";
+
+    public NuxeoConnector() {
+        username = "Administrator";
+        password = "Administrator";
+        serverName = "localhost";
+        port = "8080";
+        contextPath = "nuxeo";
+    }
 
     /**
      * get Login used to connect to Nuxeo
@@ -183,7 +198,6 @@ public class NuxeoConnector {
     /**
      * Disconnect
      */
-    // @Disconnect
     @Stop
     public void disconnect() {
         if (session != null) {
@@ -192,31 +206,17 @@ public class NuxeoConnector {
     }
 
     /**
-     * Are we connected
-     */
-    // @ValidateConnection
-    public boolean isConnected() {
-        return (session != null);
-    }
-
-    /**
-     * Are we connected
-     */
-    // @ConnectionIdentifier
-    public String connectionId() {
-        return getServerUrl() + username;
-    }
-
-    /**
      * Get a Document from Nuxeo repository
      * 
-     * @param ref the DocumentRef
+     * @param docRef the DocumentRef
      * @return a Document Object
      * @throws Exception in case of error
      */
     @Processor
-    public Document getDocument(String ref) throws Exception {
-        return docService.getDocument(ref);
+    public Document getDocument(@Placement(group = "operation parameters")
+    @FriendlyName("Document Reference (docRef)")
+    String docRef) throws Exception {
+        return docService.getDocument(docRef);
     }
 
     /**
@@ -225,7 +225,6 @@ public class NuxeoConnector {
      * @return a Document Object
      * @throws Exception
      */
-
     @Processor
     public Document getRootDocument() throws Exception {
         return getDocument("/");
@@ -234,18 +233,24 @@ public class NuxeoConnector {
     /**
      * Create a Document
      * 
-     * @param parent reference of the Parent document
-     * @param type Document Type
+     * @param parentRef reference of the Parent document
+     * @param docType Document Type
      * @param docName name of the target Document
      * @param properties Metadata
      * @return a Document Object
      * @throws Exception
      */
     @Processor
-    public Document createDocument(String parent, String type, String docName,
-            PropertyMap properties) throws Exception {
-        return docService.createDocument(new DocRef(parent), type, docName,
-                properties);
+    public Document createDocument(@Placement(group = "operation parameters")
+    @FriendlyName("Parent document reference")
+    String parentRef, @Placement(group = "operation parameters")
+    @FriendlyName("Document Type")
+    String docType, @Placement(group = "operation parameters")
+    @FriendlyName("Name of the Document")
+    String docName, @Placement(group = "operation parameters")
+    PropertyMap properties) throws Exception {
+        return docService.createDocument(new DocRef(parentRef), docType,
+                docName, properties);
     }
 
     /**
@@ -255,7 +260,8 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public void remove(String ref) throws Exception {
+    public void remove(@Placement(group = "operation parameters")
+    String ref) throws Exception {
         docService.remove(ref);
     }
 
@@ -269,7 +275,10 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document copy(String src, String targetParent, @Optional
+    public Document copy(@Placement(group = "operation parameters")
+    String src, @Placement(group = "operation parameters")
+    String targetParent, @Placement(group = "operation parameters")
+    @Optional
     @Default("")
     String docName) throws Exception {
         if (docName == null || docName.isEmpty()) {
@@ -290,7 +299,10 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document move(String src, String targetParent, @Optional
+    public Document move(@Placement(group = "operation parameters")
+    String src, @Placement(group = "operation parameters")
+    String targetParent, @Placement(group = "operation parameters")
+    @Optional
     @Default("")
     String docName) throws Exception {
         if (docName == null || docName.isEmpty()) {
@@ -309,7 +321,8 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Documents getChildren(String docRef) throws Exception {
+    public Documents getChildren(@Placement(group = "operation parameters")
+    String docRef) throws Exception {
         return docService.getChildren(new DocRef(docRef));
     }
 
@@ -322,7 +335,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document getChild(String docRef, String docName) throws Exception {
+    public Document getChild(@Placement(group = "operation parameters")
+    String docRef, @Placement(group = "operation parameters")
+    String docName) throws Exception {
         return docService.getChild(new DocRef(docRef), docName);
     }
 
@@ -334,7 +349,8 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document getParent(String docRef) throws Exception {
+    public Document getParent(@Placement(group = "operation parameters")
+    String docRef) throws Exception {
         return docService.getParent(new DocRef(docRef));
     }
 
@@ -346,7 +362,8 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Documents query(String query) throws Exception {
+    public Documents query(@Placement(group = "operation parameters")
+    String query) throws Exception {
         return docService.query(query);
     }
 
@@ -362,8 +379,12 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document setPermission(String doc, String user, String permission,
-            String acl, boolean granted) throws Exception {
+    public Document setPermission(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String user, @Placement(group = "operation parameters")
+    String permission, @Placement(group = "operation parameters")
+    String acl, @Placement(group = "operation parameters")
+    boolean granted) throws Exception {
         return docService.setPermission(new DocRef(doc), user, permission, acl,
                 granted);
     }
@@ -377,7 +398,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document removeAcl(String doc, String acl) throws Exception {
+    public Document removeAcl(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String acl) throws Exception {
         return docService.removeAcl(new DocRef(doc), acl);
     }
 
@@ -390,7 +413,9 @@ public class NuxeoConnector {
      * @throws Exceptions
      */
     @Processor
-    public Document setState(String doc, String state) throws Exception {
+    public Document setState(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String state) throws Exception {
         return docService.setState(new DocRef(doc), state);
 
     }
@@ -404,7 +429,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document lock(String doc, String lock) throws Exception {
+    public Document lock(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String lock) throws Exception {
         if (lock == null || lock.isEmpty()) {
             return docService.lock(new DocRef(doc));
         } else {
@@ -420,7 +447,8 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document unlock(String doc) throws Exception {
+    public Document unlock(@Placement(group = "operation parameters")
+    String doc) throws Exception {
         return docService.unlock(new DocRef(doc));
     }
 
@@ -434,8 +462,10 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document setProperty(String doc, String key, String value)
-            throws Exception {
+    public Document setProperty(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String key, @Placement(group = "operation parameters")
+    String value) throws Exception {
         return docService.setProperty(new DocRef(doc), key, value);
     }
 
@@ -448,7 +478,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document removeProperty(String doc, String key) throws Exception {
+    public Document removeProperty(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String key) throws Exception {
         return docService.removeProperty(new DocRef(doc), key);
     }
 
@@ -461,7 +493,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document update(String doc, PropertyMap properties) throws Exception {
+    public Document update(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    PropertyMap properties) throws Exception {
         return docService.update(new DocRef(doc), properties);
     }
 
@@ -475,7 +509,10 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document publish(String doc, String section, @Optional
+    public Document publish(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String section, @Placement(group = "operation parameters")
+    @Optional
     @Default("false")
     boolean override) throws Exception {
         return docService.publish(new DocRef(doc), new DocRef(section),
@@ -492,8 +529,10 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document createRelation(String subject, String predicate,
-            DocRef object) throws Exception {
+    public Document createRelation(@Placement(group = "operation parameters")
+    String subject, @Placement(group = "operation parameters")
+    String predicate, @Placement(group = "operation parameters")
+    DocRef object) throws Exception {
         return docService.createRelation(new DocRef(subject), predicate, object);
     }
 
@@ -508,8 +547,10 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Documents getRelations(String doc, String predicate, boolean outgoing)
-            throws Exception {
+    public Documents getRelations(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    String predicate, @Placement(group = "operation parameters")
+    boolean outgoing) throws Exception {
         return docService.getRelations(new DocRef(doc), predicate, outgoing);
     }
 
@@ -522,8 +563,11 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public void setBlob(String doc, FileBlob blob, @Optional
+    public void setBlob(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    FileBlob blob, @Optional
     @Default("")
+    @Placement(group = "operation parameters")
     String xpath) throws Exception {
 
         if (xpath == null || xpath.isEmpty()) {
@@ -541,7 +585,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public void removeBlob(String doc, @Optional
+    public void removeBlob(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    @Optional
     @Default("")
     String xpath) throws Exception {
 
@@ -562,7 +608,9 @@ public class NuxeoConnector {
      */
 
     @Processor
-    public FileBlob getBlob(String doc, @Optional
+    public FileBlob getBlob(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    @Optional
     @Default("")
     String xpath) throws Exception {
 
@@ -601,7 +649,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public Document createVersion(String doc, @Optional
+    public Document createVersion(@Placement(group = "operation parameters")
+    String doc, @Placement(group = "operation parameters")
+    @Optional
     @Default("")
     String increment) throws Exception {
 
@@ -620,7 +670,9 @@ public class NuxeoConnector {
      * @throws Exception
      */
     @Processor
-    public void fireEvent(String event, @Optional
+    public void fireEvent(@Placement(group = "operation parameters")
+    String event, @Placement(group = "operation parameters")
+    @Optional
     @Default("")
     String doc) throws Exception {
         if (doc == null || doc.isEmpty()) {
@@ -628,6 +680,52 @@ public class NuxeoConnector {
         } else {
             docService.fireEvent(new DocRef(doc), event);
         }
+    }
+
+    /**
+     * Executes an arbitrary operation
+     * 
+     * @param operationName Name of the Automation Operation
+     * @param input Input of the Operation
+     * @param params Parameters of the Operation
+     * @return Result of the Operation
+     * @throws Exception
+     */
+    @Processor
+    public Object runOperation(@Placement(group = "operation parameters")
+    String operationName, @Placement(group = "operation parameters")
+    @Optional
+    Object input, @Optional
+    @Placement(group = "operation parameters")
+    Map<String, String> params) throws Exception {
+        OperationRequest request = session.newRequest(operationName);
+        OperationDocumentation opDef = request.getOperation();
+
+        // fill operation parameter according to signature
+        for (Param param : opDef.getParams()) {
+            for (String pname : params.keySet()) {
+                if (pname.equals(param.getName())) {
+                    request.set(pname, params.get(pname));
+                    break;
+                }
+            }
+        }
+
+        if (input != null) {
+            String[] sig = opDef.getSignature();
+            for (int i = 0; i < sig.length; i = i + 2) {
+                String inputType = sig[i];
+                if (inputType.equals("Document")) {
+                    request.setInput(new DocRef(input.toString()));
+                } else if (inputType.equals("Blob")) {
+                    if (input instanceof File) {
+                        request.setInput(new FileBlob((File) input));
+                    }
+                }
+            }
+        }
+
+        return request.execute();
     }
 
 }
