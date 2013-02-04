@@ -1,0 +1,3 @@
+<!-- BEGIN_INCLUDE(nuxeo:my-processor) -->
+    <nuxeo:my-processor content="#[map-payload:content]" />
+<!-- END_INCLUDE(nuxeo:my-processor) -->
