@@ -5,26 +5,18 @@ package org.nuxeo.mule;
 
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Connect;
-import org.mule.api.annotations.ConnectionIdentifier;
-import org.mule.api.annotations.Connector;
-import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
-import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
-import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
-import org.nuxeo.ecm.automation.client.model.Blob;
-import org.nuxeo.ecm.automation.client.model.Blobs;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
@@ -227,300 +219,361 @@ public class NuxeoConnector {
         return docService.getDocument(ref);
     }
 
-    /*    *//**
+    /**
      * Get the root Document of Nuxeo Repository
      * 
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document getRootDocument() throws Exception { return
-     * getDocument("/"); }
-     *//**
+
+    @Processor
+    public Document getRootDocument() throws Exception {
+        return getDocument("/");
+    }
+
+    /**
      * Create a Document
      * 
-     * @param parent
-     * @param type
-     * @param docName
-     * @param properties
+     * @param parent reference of the Parent document
+     * @param type Document Type
+     * @param docName name of the target Document
+     * @param properties Metadata
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document createDocument(String parent, String type,
-     * String docName, PropertyMap properties) throws Exception { return
-     * docService.createDocument(new DocRef(parent), type, docName, properties);
-     * }
-     *//**
+    @Processor
+    public Document createDocument(String parent, String type, String docName,
+            PropertyMap properties) throws Exception {
+        return docService.createDocument(new DocRef(parent), type, docName,
+                properties);
+    }
+
+    /**
      * Deletes a Document
      * 
-     * @param ref
+     * @param ref reference of the Document to delete
      * @throws Exception
      */
-    /*
-     * @Processor public void remove(String ref) throws Exception {
-     * docService.remove(ref); }
-     *//**
+    @Processor
+    public void remove(String ref) throws Exception {
+        docService.remove(ref);
+    }
+
+    /**
      * Copy a Document
      * 
-     * @param src
-     * @param targetParent
-     * @param docName
+     * @param src reference of the source document
+     * @param targetParent reference of the destination document
+     * @param docName name of the copied document
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document copy(String src, String targetParent,
-     * 
-     * @Optional
-     * 
-     * @Default("") String docName) throws Exception { if (docName == null ||
-     * docName.isEmpty()) { return docService.copy(new DocRef(src), new
-     * DocRef(targetParent)); } else { return docService.copy(new DocRef(src),
-     * new DocRef(targetParent), docName); } }
-     *//**
+    @Processor
+    public Document copy(String src, String targetParent, @Optional
+    @Default("")
+    String docName) throws Exception {
+        if (docName == null || docName.isEmpty()) {
+            return docService.copy(new DocRef(src), new DocRef(targetParent));
+        } else {
+            return docService.copy(new DocRef(src), new DocRef(targetParent),
+                    docName);
+        }
+    }
+
+    /**
      * Move a Document
      * 
-     * @param src
-     * @param targetParent
-     * @param docName
+     * @param src the reference of the document to move
+     * @param targetParent the reference of thr target parent
+     * @param docName the name of the document after move
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document move(String src, String targetParent,
+    @Processor
+    public Document move(String src, String targetParent, @Optional
+    @Default("")
+    String docName) throws Exception {
+        if (docName == null || docName.isEmpty()) {
+            return docService.move(new DocRef(src), new DocRef(targetParent));
+        } else {
+            return docService.move(new DocRef(src), new DocRef(targetParent),
+                    docName);
+        }
+    }
+
+    /**
+     * Retrieves children of a Document
      * 
-     * @Optional
-     * 
-     * @Default("") String docName) throws Exception { if (docName == null ||
-     * docName.isEmpty()) { return docService.move(new DocRef(src), new
-     * DocRef(targetParent)); } else { return docService.move(new DocRef(src),
-     * new DocRef(targetParent), docName); } }
-     *//**
-     * Retrievs children of a Document
-     * 
-     * @param docRef
+     * @param docRef Reference of the parent Document
      * @return a Documents List
      * @throws Exception
      */
-    /*
-     * @Processor public Documents getChildren(String docRef) throws Exception {
-     * return docService.getChildren(new DocRef(docRef)); }
-     *//**
+    @Processor
+    public Documents getChildren(String docRef) throws Exception {
+        return docService.getChildren(new DocRef(docRef));
+    }
+
+    /**
      * Get a children
      * 
-     * @param docRef
-     * @param docName
+     * @param docRef reference of the parent Document
+     * @param docName name of the child to fetch
      * @return a Document Objects
      * @throws Exception
      */
-    /*
-     * @Processor public Document getChild(String docRef, String docName) throws
-     * Exception { return docService.getChild(new DocRef(docRef), docName); }
-     *//**
+    @Processor
+    public Document getChild(String docRef, String docName) throws Exception {
+        return docService.getChild(new DocRef(docRef), docName);
+    }
+
+    /**
      * Get Parent Document
      * 
-     * @param docRef
+     * @param docRef reference of the Document
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document getParent(String docRef) throws Exception {
-     * return docService.getParent(new DocRef(docRef)); }
-     *//**
-     * Runs a NXQL Quetry against repository
+    @Processor
+    public Document getParent(String docRef) throws Exception {
+        return docService.getParent(new DocRef(docRef));
+    }
+
+    /**
+     * Runs a NXQL Query against repository
      * 
-     * @param query
+     * @param query NXQL Query
      * @return a Documents List
      * @throws Exception
      */
-    /*
-     * @Processor public Documents query(String query) throws Exception { return
-     * docService.query(query); }
-     *//**
+    @Processor
+    public Documents query(String query) throws Exception {
+        return docService.query(query);
+    }
+
+    /**
      * Set Permission
      * 
-     * @param doc
-     * @param user
-     * @param permission
-     * @param acl
-     * @param granted
+     * @param doc reference of the target Document
+     * @param user username or groupname to give permission to
+     * @param permission permissionname
+     * @param acl ACL
+     * @param granted grant/deny flag
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document setPermission(String doc, String user, String
-     * permission, String acl, boolean granted) throws Exception { return
-     * docService.setPermission(new DocRef(doc), user, permission, acl,
-     * granted); }
-     *//**
+    @Processor
+    public Document setPermission(String doc, String user, String permission,
+            String acl, boolean granted) throws Exception {
+        return docService.setPermission(new DocRef(doc), user, permission, acl,
+                granted);
+    }
+
+    /**
      * Removes an ACL
      * 
-     * @param doc
-     * @param acl
+     * @param doc reference of the target Document
+     * @param acl ACL
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document removeAcl(String doc, String acl) throws
-     * Exception { return docService.removeAcl(new DocRef(doc), acl); }
-     *//**
+    @Processor
+    public Document removeAcl(String doc, String acl) throws Exception {
+        return docService.removeAcl(new DocRef(doc), acl);
+    }
+
+    /**
      * Set Lifecycle State
      * 
-     * @param doc
-     * @param state
+     * @param doc reference to the target Document
+     * @param state LifeCycle State
      * @return a Document Object
      * @throws Exceptions
      */
-    /*
-     * @Processor public Document setState(String doc, String state) throws
-     * Exception { return docService.setState(new DocRef(doc), state);
-     * 
-     * }
-     *//**
+    @Processor
+    public Document setState(String doc, String state) throws Exception {
+        return docService.setState(new DocRef(doc), state);
+
+    }
+
+    /**
      * Locks a Document
      * 
-     * @param doc
-     * @param lock
+     * @param doc target Document
+     * @param lock lock info (can be null)
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document lock(String doc, String lock) throws Exception
-     * { return docService.lock(new DocRef(doc), lock); }
-     *//**
+    @Processor
+    public Document lock(String doc, String lock) throws Exception {
+        if (lock == null || lock.isEmpty()) {
+            return docService.lock(new DocRef(doc));
+        } else {
+            return docService.lock(new DocRef(doc), lock);
+        }
+    }
+
+    /**
      * Unlocks a Document
      * 
-     * @param doc
+     * @param doc reference to the target Document
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document unlock(String doc) throws Exception { return
-     * docService.unlock(new DocRef(doc)); }
-     *//**
+    @Processor
+    public Document unlock(String doc) throws Exception {
+        return docService.unlock(new DocRef(doc));
+    }
+
+    /**
      * Change a property on a Document
      * 
-     * @param doc
-     * @param key
-     * @param value
+     * @param doc reference to the target Document
+     * @param key property Name
+     * @param value property Value
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document setProperty(String doc, String key, String
-     * value) throws Exception { return docService.setProperty(new DocRef(doc),
-     * key, value); }
-     *//**
+    @Processor
+    public Document setProperty(String doc, String key, String value)
+            throws Exception {
+        return docService.setProperty(new DocRef(doc), key, value);
+    }
+
+    /**
      * Remove a Property on a Document
      * 
-     * @param doc
-     * @param key
+     * @param doc reference to the target Document
+     * @param key property name
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document removeProperty(String doc, String key) throws
-     * Exception { return docService.removeProperty(new DocRef(doc), key); }
-     *//**
+    @Processor
+    public Document removeProperty(String doc, String key) throws Exception {
+        return docService.removeProperty(new DocRef(doc), key);
+    }
+
+    /**
      * Updates a Document
      * 
-     * @param doc
-     * @param properties
+     * @param doc reference to the target Document
+     * @param properties Map of properties to set on document
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document update(String doc, PropertyMap properties)
-     * throws Exception { return docService.update(new DocRef(doc), properties);
-     * }
-     *//**
+    @Processor
+    public Document update(String doc, PropertyMap properties) throws Exception {
+        return docService.update(new DocRef(doc), properties);
+    }
+
+    /**
      * Publish a Document
      * 
-     * @param doc
-     * @param section
-     * @param override
+     * @param doc reference to the target Document
+     * @param section reference of the publish target
+     * @param override flag to control override
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document publish(String doc, String section, @Optional
-     * 
-     * @Default("false") boolean override) throws Exception { return
-     * docService.publish(new DocRef(doc), new DocRef(section), override); }
-     *//**
+    @Processor
+    public Document publish(String doc, String section, @Optional
+    @Default("false")
+    boolean override) throws Exception {
+        return docService.publish(new DocRef(doc), new DocRef(section),
+                override);
+    }
+
+    /**
      * Create a Relation
      * 
-     * @param subject
-     * @param predicate
-     * @param object
+     * @param subject reference to the target Document
+     * @param predicate predicate of the relation
+     * @param object reference on the target related Document
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document createRelation(String subject, String
-     * predicate, DocRef object) throws Exception { return
-     * docService.createRelation(new DocRef(subject), predicate, object); }
-     *//**
+    @Processor
+    public Document createRelation(String subject, String predicate,
+            DocRef object) throws Exception {
+        return docService.createRelation(new DocRef(subject), predicate, object);
+    }
+
+    /**
      * get Relations
      * 
-     * @param doc
-     * @param predicate
-     * @param outgoing
+     * @param doc reference to the target Document
+     * @param predicate predicate to search for
+     * @param outgoing flag to indicate of relations processed must be outgoing
+     *            or incoming
      * @return list of linked Document Objects
      * @throws Exception
      */
-    /*
-     * @Processor public Documents getRelations(String doc, String predicate,
-     * boolean outgoing) throws Exception { return docService.getRelations(new
-     * DocRef(doc), predicate, outgoing); }
-     *//**
+    @Processor
+    public Documents getRelations(String doc, String predicate, boolean outgoing)
+            throws Exception {
+        return docService.getRelations(new DocRef(doc), predicate, outgoing);
+    }
+
+    /**
      * Attach a Blob to a Document
      * 
-     * @param doc
-     * @param blob
-     * @param xpath
+     * @param doc reference to the target Document
+     * @param blob Blob to attach
+     * @param xpath Xpath of the target property
      * @throws Exception
      */
-    /*
-     * @Processor public void setBlob(String doc, Blob blob, @Optional
-     * 
-     * @Default("") String xpath) throws Exception {
-     * 
-     * if (xpath == null || xpath.isEmpty()) { docService.setBlob(new
-     * DocRef(doc), blob); } else { docService.setBlob(new DocRef(doc), blob,
-     * xpath); } }
-     *//**
+    @Processor
+    public void setBlob(String doc, FileBlob blob, @Optional
+    @Default("")
+    String xpath) throws Exception {
+
+        if (xpath == null || xpath.isEmpty()) {
+            docService.setBlob(new DocRef(doc), blob);
+        } else {
+            docService.setBlob(new DocRef(doc), blob, xpath);
+        }
+    }
+
+    /**
      * Remove a Blob from a Document
      * 
-     * @param doc
-     * @param xpath
+     * @param doc reference to the target Document
+     * @param xpath xpath of the target Blob
      * @throws Exception
      */
-    /*
-     * @Processor public void removeBlob(String doc, @Optional
-     * 
-     * @Default("") String xpath) throws Exception {
-     * 
-     * if (xpath == null || xpath.isEmpty()) { docService.removeBlob(new
-     * DocRef(doc)); } else { docService.removeBlob(new DocRef(doc), xpath); } }
-     *//**
+    @Processor
+    public void removeBlob(String doc, @Optional
+    @Default("")
+    String xpath) throws Exception {
+
+        if (xpath == null || xpath.isEmpty()) {
+            docService.removeBlob(new DocRef(doc));
+        } else {
+            docService.removeBlob(new DocRef(doc), xpath);
+        }
+    }
+
+    /**
      * get the Blob associated to a Document
      * 
-     * @param doc
-     * @param xpath
+     * @param doc reference to the target Document
+     * @param xpath xpath of the target Blob
      * @return a FileBlob object
      * @throws Exception
      */
-    /*
-     * @Processor public FileBlob getBlob(String doc, @Optional
-     * 
-     * @Default("") String xpath) throws Exception {
-     * 
-     * if (xpath == null || xpath.isEmpty()) { return docService.getBlob(new
-     * DocRef(doc)); } else { return docService.getBlob(new DocRef(doc), xpath);
-     * } }
-     *//**
+
+    @Processor
+    public FileBlob getBlob(String doc, @Optional
+    @Default("")
+    String xpath) throws Exception {
+
+        if (xpath == null || xpath.isEmpty()) {
+            return docService.getBlob(new DocRef(doc));
+        } else {
+            return docService.getBlob(new DocRef(doc), xpath);
+        }
+    }
+
+    /**
      * get the Blobs associated to a Document
      * 
      * @param doc
@@ -528,42 +581,53 @@ public class NuxeoConnector {
      * @return a list of Blobs
      * @throws Exception
      */
+    // @Processor
     /*
-     * @Processor public Blobs getBlobs(String doc, @Optional
+     * public Blobs getBlobs(String doc, @Optional
      * 
      * @Default("") String xpath) throws Exception {
      * 
      * if (xpath == null || xpath.isEmpty()) { return docService.getBlobs(new
      * DocRef(doc)); } else { return docService.getBlobs(new DocRef(doc),
      * xpath); } }
-     *//**
+     */
+
+    /**
      * Creates a version
      * 
-     * @param doc
-     * @param increment
+     * @param doc reference to the target Document
+     * @param increment increment policy (minor/major)
      * @return a Document Object
      * @throws Exception
      */
-    /*
-     * @Processor public Document createVersion(String doc, @Optional
-     * 
-     * @Default("") String increment) throws Exception {
-     * 
-     * if (increment == null || increment.isEmpty()) { return
-     * docService.createVersion(new DocRef(doc)); } else { return
-     * docService.createVersion(new DocRef(doc), increment); } }
-     *//**
+    @Processor
+    public Document createVersion(String doc, @Optional
+    @Default("")
+    String increment) throws Exception {
+
+        if (increment == null || increment.isEmpty()) {
+            return docService.createVersion(new DocRef(doc));
+        } else {
+            return docService.createVersion(new DocRef(doc), increment);
+        }
+    }
+
+    /**
      * Fire an Event
      * 
-     * @param event
-     * @param doc
+     * @param event name of the event to raise
+     * @param doc reference to the document to attach to the event
      * @throws Exception
      */
-    /*
-     * @Processor public void fireEvent(String event, @Optional
-     * 
-     * @Default("") String doc) throws Exception { if (doc == null ||
-     * doc.isEmpty()) { docService.fireEvent(event); } else {
-     * docService.fireEvent(new DocRef(doc), event); } }
-     */
+    @Processor
+    public void fireEvent(String event, @Optional
+    @Default("")
+    String doc) throws Exception {
+        if (doc == null || doc.isEmpty()) {
+            docService.fireEvent(event);
+        } else {
+            docService.fireEvent(new DocRef(doc), event);
+        }
+    }
+
 }
