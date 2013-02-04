@@ -9,10 +9,13 @@ import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
+import org.mule.api.annotations.lifecycle.Start;
+import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -34,7 +37,7 @@ import org.nuxeo.ecm.automation.client.model.PropertyMap;
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
  * 
  */
-@Connector(name = "nuxeo", schemaVersion = "1.0-SNAPSHOT")
+@Module(name = "nuxeo", schemaVersion = "1.0-SNAPSHOT")
 public class NuxeoConnector {
 
     /**
@@ -177,7 +180,8 @@ public class NuxeoConnector {
      * 
      * @throws ConnectionException
      */
-    @Connect
+    // @Connect
+    @Start
     public void connect() throws ConnectionException {
         AutomationClient client = new HttpAutomationClient(getServerUrl());
         session = client.getSession(this.username, this.password);
@@ -187,7 +191,8 @@ public class NuxeoConnector {
     /**
      * Disconnect
      */
-    @Disconnect
+    // @Disconnect
+    @Stop
     public void disconnect() {
         if (session != null) {
             session.close();
@@ -197,7 +202,7 @@ public class NuxeoConnector {
     /**
      * Are we connected
      */
-    @ValidateConnection
+    // @ValidateConnection
     public boolean isConnected() {
         return (session != null);
     }
@@ -205,7 +210,7 @@ public class NuxeoConnector {
     /**
      * Are we connected
      */
-    @ConnectionIdentifier
+    // @ConnectionIdentifier
     public String connectionId() {
         return getServerUrl() + username;
     }
