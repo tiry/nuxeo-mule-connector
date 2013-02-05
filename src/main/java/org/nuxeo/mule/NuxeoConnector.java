@@ -10,14 +10,17 @@ import java.util.Map;
 
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
-import org.mule.api.annotations.Module;
+import org.mule.api.annotations.Connect;
+import org.mule.api.annotations.ConnectionIdentifier;
+import org.mule.api.annotations.Connector;
+import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
+import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
-import org.mule.api.annotations.lifecycle.Start;
-import org.mule.api.annotations.lifecycle.Stop;
+import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.nuxeo.ecm.automation.client.AutomationClient;
@@ -40,23 +43,8 @@ import org.nuxeo.ecm.automation.client.model.StringBlob;
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
  * 
  */
-@Module(name = "nuxeo", schemaVersion = "1.0-SNAPSHOT")
+@Connector(name = "nuxeo", schemaVersion = "1.0-SNAPSHOT")
 public class NuxeoConnector {
-
-    /**
-     * Username to connect to Nuxeo Server
-     */
-    @Configurable
-    @Placement(group = "Authentication")
-    private String username;
-
-    /**
-     * Password to connect to Nuxeo Server
-     */
-    @Configurable
-    @Password
-    @Placement(group = "Authentication")
-    private String password;
 
     /**
      * Nuxeo Server name (IP or DNS name)
@@ -80,29 +68,9 @@ public class NuxeoConnector {
     private String contextPath = "nuxeo";
 
     public NuxeoConnector() {
-        username = "Administrator";
-        password = "Administrator";
         serverName = "localhost";
         port = "8080";
         contextPath = "nuxeo";
-    }
-
-    /**
-     * get Login used to connect to Nuxeo
-     * 
-     * @return Login used to connect to Nuxeo
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * get Password used to connect to Nuxeo
-     * 
-     * @return Password used to connect to Nuxeo
-     */
-    public String getPassword() {
-        return password;
     }
 
     /**
@@ -130,24 +98,6 @@ public class NuxeoConnector {
      */
     public String getContextPath() {
         return contextPath;
-    }
-
-    /**
-     * set Username used to connect to Nuxeo Server
-     * 
-     * @param username
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * set Password used to connect to Nuxeo Server
-     * 
-     * @param password
-     */
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     /**
@@ -189,23 +139,50 @@ public class NuxeoConnector {
     /**
      * Connect to Nuxeo Server via Automation java client
      * 
+     * @param username Nuxeo user name
+     * @param password Nuxeo password
      * @throws ConnectionException
      */
-    // @Connect
-    @Start
-    public void connect() throws ConnectionException {
+    @Connect
+    public void connect(@ConnectionKey
+    String username, @Password
+    String password) throws ConnectionException {
         AutomationClient client = new HttpAutomationClient(getServerUrl());
-        session = client.getSession(this.username, this.password);
+        session = client.getSession(username, password);
         docService = session.getAdapter(DocumentService.class);
     }
 
     /**
      * Disconnect
      */
-    @Stop
+    @Disconnect
     public void disconnect() {
         if (session != null) {
             session.close();
+        }
+    }
+
+    /**
+     * Are we connected
+     * 
+     * @return true if an Automation Session is active
+     */
+    @ValidateConnection
+    public boolean isConnected() {
+        return (session != null);
+    }
+
+    /**
+     * Are we connected
+     * 
+     * @return fake ConnectionId based on serverUrl and username
+     */
+    @ConnectionIdentifier
+    public String connectionId() {
+        if (session != null) {
+            return getServerUrl() + session.getLogin();
+        } else {
+            return getServerUrl();
         }
     }
 
