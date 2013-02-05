@@ -4,12 +4,15 @@
 package org.nuxeo.mule;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.mule.api.ConnectionException;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Module;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
@@ -29,6 +32,7 @@ import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.PropertyMap;
+import org.nuxeo.ecm.automation.client.model.StringBlob;
 
 /**
  * Connector that uses Nuxeo Automation java client to leverage Nuxeo Rest API
@@ -727,6 +731,72 @@ public class NuxeoConnector {
             }
         }
         return request.execute();
+    }
+
+    /**
+     * @Mime(MimeTypes.JSON)
+     * @Transformer(sourceTypes = { Document.class }) public static String
+     *                          documentToJSON(Document doc) {
+     * 
+     *                          return null; }
+     **/
+
+    /**
+     * Creates a Blob from a File
+     * 
+     * @param file the input File
+     * @return the Blob wrapping the File
+     */
+    @Transformer(sourceTypes = { File.class })
+    public static FileBlob fileToBlob(File file) {
+        return new FileBlob(file);
+    }
+
+    /**
+     * Creates a Blob from a String
+     * 
+     * @param file the input String
+     * @return the Blob wrapping the String
+     */
+    @Transformer(sourceTypes = { String.class })
+    public static StringBlob stringToBlob(String input) {
+        return new StringBlob(input);
+    }
+
+    /**
+     * Convert a Document to a Simple Map
+     * 
+     * @param doc the Document to convert
+     * @return the resulting Map<String, Object>
+     */
+    @Transformer(sourceTypes = { String.class })
+    public static Map<String, Object> documentToMap(Document doc) {
+        Map<String, Object> map = doc.getProperties().map();
+        map.put("type", doc.getType());
+        map.put("facets", doc.getFacets().list());
+        map.put("id", doc.getId());
+        map.put("lock", doc.getLock());
+        map.put("lockCreated", doc.getLockCreated());
+        map.put("lockOwner", doc.getLockOwner());
+        map.put("path", doc.getPath());
+        map.put("repository", doc.getRepository());
+        map.put("state", doc.getState());
+        return map;
+    }
+
+    /**
+     * Converts a list of Documents into a simple list of Map
+     * 
+     * @param docs the Documents list to convert
+     * @return the resulting List of Map
+     */
+    @Transformer(sourceTypes = { String.class })
+    public static List<Map<String, Object>> documentsToListOfMap(Documents docs) {
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        for (Document doc : docs) {
+            result.add(documentToMap(doc));
+        }
+        return result;
     }
 
 }
