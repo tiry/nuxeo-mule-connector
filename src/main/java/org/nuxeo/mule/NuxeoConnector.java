@@ -746,7 +746,7 @@ public class NuxeoConnector {
      * @param doc the Document to convert
      * @return the resulting Map<String, Object>
      */
-    @Transformer(sourceTypes = { String.class })
+    @Transformer(sourceTypes = { Document.class })
     public static Map<String, Object> documentToMap(Document doc) {
         Map<String, Object> map = doc.getProperties().map();
         map.put("type", doc.getType());
@@ -767,7 +767,7 @@ public class NuxeoConnector {
      * @param docs the Documents list to convert
      * @return the resulting List of Map
      */
-    @Transformer(sourceTypes = { String.class })
+    @Transformer(sourceTypes = { Documents.class })
     public static List<Map<String, Object>> documentsToListOfMap(Documents docs) {
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         for (Document doc : docs) {

@@ -3,12 +3,14 @@
  */
 package org.nuxeo.mule;
 
-import org.mule.api.MuleEvent;
-import org.mule.construct.Flow;
-import org.mule.tck.FunctionalTestCase;
-import org.mule.tck.AbstractMuleTestCase;
+import java.util.Map;
 
 import org.junit.Test;
+import org.mule.api.MuleEvent;
+import org.mule.construct.Flow;
+import org.mule.tck.AbstractMuleTestCase;
+import org.mule.tck.FunctionalTestCase;
+import org.nuxeo.ecm.automation.client.model.Document;
 
 public class NuxeoConnectorTest extends FunctionalTestCase {
     @Override
@@ -17,8 +19,21 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
     }
 
     @Test
-    public void testFlow() throws Exception {
-        runFlowAndExpect("testFlow", "Another stringnux");
+    public void testSimpleFlow() throws Exception {
+        Flow flow = lookupFlowConstruct("nuxeoTestFlow1");
+        MuleEvent event = AbstractMuleTestCase.getTestEvent(null);
+        MuleEvent responseEvent = flow.process(event);
+        Document doc = (Document) responseEvent.getMessage().getPayload();
+        assertEquals("Mule Workspace", doc.getTitle());
+    }
+
+    @Test
+    public void testSimpleFlowWithTransformer() throws Exception {
+        Flow flow = lookupFlowConstruct("nuxeoTestFlowWithConverter");
+        MuleEvent event = AbstractMuleTestCase.getTestEvent(null);
+        MuleEvent responseEvent = flow.process(event);
+        Map<String, Object> map = (Map<String, Object>) responseEvent.getMessage().getPayload();
+        assertEquals("Mule Workspace", map.get("dc:title"));
     }
 
     /**
