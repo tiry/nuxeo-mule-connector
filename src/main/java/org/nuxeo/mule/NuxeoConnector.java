@@ -17,9 +17,11 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.ValidateConnection;
+import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.param.ConnectionKey;
+import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
@@ -31,6 +33,7 @@ import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
 import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
+import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 
@@ -64,10 +67,41 @@ public class NuxeoConnector extends BaseDocumentService {
     @Placement(group = "Connection")
     private String contextPath = "nuxeo";
 
+    /**
+     * comma separated String listing schemas that must be sent by the server
+     * when returning Documents
+     */
+    @Configurable
+    @Optional
+    @Placement(group = "Marshaling")
+    private String defaultSchemas = null;
+
+    private Session session;
+
     public NuxeoConnector() {
         serverName = "localhost";
         port = "8080";
         contextPath = "nuxeo";
+    }
+
+    /**
+     * get the default schemas that should be set by the server when sending
+     * Documents
+     * 
+     * @return comma separated String listing schemas
+     */
+    public String getDefaultSchemas() {
+        return defaultSchemas;
+    }
+
+    /**
+     * set the default schemas that should be set by the server when sending
+     * Documents
+     * 
+     * @param defaultSchemas comma separated String listing schemas
+     */
+    public void setDefaultSchemas(String defaultSchemas) {
+        this.defaultSchemas = defaultSchemas;
     }
 
     /**
@@ -124,8 +158,6 @@ public class NuxeoConnector extends BaseDocumentService {
         this.contextPath = contextPath;
     }
 
-    private Session session;
-
     protected String getServerUrl() {
         return "http://" + serverName + ":" + port + "/" + contextPath
                 + "/site/automation";
@@ -144,7 +176,7 @@ public class NuxeoConnector extends BaseDocumentService {
     String password) throws ConnectionException {
         AutomationClient client = new HttpAutomationClient(getServerUrl());
         session = client.getSession(username, password);
-
+        session.setDefaultSchemas(defaultSchemas);
         docService = session.getAdapter(DocumentService.class);
     }
 
@@ -180,6 +212,130 @@ public class NuxeoConnector extends BaseDocumentService {
         } else {
             return getServerUrl();
         }
+    }
+
+    /**
+     * Runs a NXQL Query against repository, result is returned as a list of
+     * pages of Document
+     * 
+     * @param query the NXQL Query
+     * @param page the page number
+     * @param pageSize the page size
+     * @param queryParams the query parameters if any
+     * @param sortInfo sort columns
+     * @return a batched list of Documents
+     * @throws Exception
+     */
+    @Processor
+    public Documents query(@Placement(group = "operation parameters")
+    String query, @Placement(group = "operation parameters")
+    @Optional
+    @Default("0")
+    Integer page, @Placement(group = "operation parameters")
+    @Optional
+    @Default("20")
+    Integer pageSize, @Placement(group = "operation parameters")
+    @Optional
+    @FriendlyName("Query parameters")
+    List<String> queryParams, @Placement(group = "operation parameters")
+    @Optional
+    @FriendlyName("Sort columns")
+    List<String> sortInfo) throws Exception {
+        return (Documents) execPageProvider(null, query, page, pageSize,
+                queryParams, sortInfo, false);
+    }
+
+    /**
+     * Runs a NXQL Query against repository, result is returned as a list of
+     * pages of Records
+     * 
+     * @param query the NXQL Query
+     * @param page the page number
+     * @param pageSize the page size
+     * @param queryParams the query parameters if any
+     * @param sortInfo sort columns
+     * @return a batched list of Records
+     * @throws Exception
+     */
+
+    @Processor
+    public RecordSet queryAndFetch(@Placement(group = "operation parameters")
+    String query, @Placement(group = "operation parameters")
+    @Optional
+    @Default("0")
+    Integer page, @Placement(group = "operation parameters")
+    @Optional
+    @Default("20")
+    Integer pageSize, @Placement(group = "operation parameters")
+    @Optional
+    @FriendlyName("Query parameters")
+    List<String> queryParams, @Placement(group = "operation parameters")
+    @Optional
+    @FriendlyName("Sort columns")
+    List<String> sortInfo) throws Exception {
+        return (RecordSet) execPageProvider(null, query, page, pageSize,
+                queryParams, sortInfo, true);
+    }
+
+    /**
+     * Runs a Page Provider (named query) against repository, result is returned
+     * as a list of pages of Document
+     * 
+     * @param pageProviderName the name if the PagteProvider to run
+     * @param page the page number
+     * @param pageSize the page size
+     * @param queryParams the query parameters if any
+     * @param sortInfo sort columns
+     * @return a batched list of Documents
+     * @throws Exception
+     */
+    @Processor
+    public Documents pageProvider(@Placement(group = "operation parameters")
+    String pageProviderName, @Placement(group = "operation parameters")
+    @Optional
+    @Default("0")
+    Integer page, @Placement(group = "operation parameters")
+    @Optional
+    @Default("20")
+    Integer pageSize, @Placement(group = "operation parameters")
+    @Optional
+    @FriendlyName("Query parameters")
+    List<String> queryParams, @Placement(group = "operation parameters")
+    @Optional
+    @FriendlyName("Sort columns")
+    List<String> sortInfo) throws Exception {
+        return (Documents) execPageProvider(pageProviderName, null, page,
+                pageSize, queryParams, sortInfo, false);
+    }
+
+    protected Object execPageProvider(String pageProvider, String query,
+            Integer page, Integer pageSize, List<String> queryParams,
+            List<String> sortInfo, boolean useRecordSet) throws Exception {
+
+        OperationRequest request;
+        if (useRecordSet) {
+            request = session.newRequest("Resultset.PageProvider");
+        } else {
+            request = session.newRequest("Document.PageProvider");
+        }
+        OperationDocumentation opDef = request.getOperation();
+
+        if (query == null || query.isEmpty()) {
+            request.set("query", query);
+        } else {
+            request.set("providerName", pageProvider);
+        }
+
+        request.set("page", page);
+        request.set("pageSize", pageSize);
+        if (queryParams != null) {
+            request.set("queryParams", queryParams);
+        }
+        if (sortInfo != null) {
+            request.set("sortInfo", sortInfo);
+        }
+
+        return request.execute();
     }
 
     /**

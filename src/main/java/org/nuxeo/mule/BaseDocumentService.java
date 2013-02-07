@@ -182,19 +182,6 @@ public class BaseDocumentService {
     }
 
     /**
-     * Runs a NXQL Query against repository
-     * 
-     * @param query NXQL Query
-     * @return a Documents List
-     * @throws Exception
-     */
-    @Processor
-    public Documents query(@Placement(group = "operation parameters")
-    String query) throws Exception {
-        return docService.query(query);
-    }
-
-    /**
      * Set Permission
      * 
      * @param doc reference of the target Document

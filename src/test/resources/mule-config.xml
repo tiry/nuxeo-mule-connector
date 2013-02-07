@@ -12,7 +12,6 @@
         http://www.mulesoft.org/schema/mule/nuxeo http://www.mulesoft.org/schema/mule/nuxeo/1.0-SNAPSHOT/mule-nuxeo.xsd
         http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-    <nuxeo:config name="Nuxeo" username="Administrator" password="Administrator" serverName="127.0.0.1" port="8080" contextPath="nuxeo" />
     <nuxeo:config name="NuxeoServer" username="Administrator" password="Administrator" serverName="localhost" port="8080" contextPath="nuxeo" />
 
     <flow name="nuxeoTestFlow1" doc:name="nuxeoTestFlow1">
