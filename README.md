@@ -6,12 +6,18 @@ It is based on Nuxeo Automation API.
 
 ## To build the plugin
 
-> mvn -Ddevkit.studio.package.skip=false -Ddevkit.javadoc.check.skip  -DskipTests=true  -Dmaven.test.skip=true clean package
+Quick build 
+
+> mvn -Ddevkit.studio.package.skip=false -Ddevkit.javadoc.check.skip -DskipTests=true  -Dmaven.test.skip=true clean package
+
+Build with tests
+
+> mvn -Ddevkit.studio.package.skip=false  clean package
+
 
 Then use the update site generated in target/update-site to load the plugin from MuleStudio
 
 NB : You have to use Maven 3 and Java 6 (you can 'source' env.sh for that)
-
 
 ## Update site
 

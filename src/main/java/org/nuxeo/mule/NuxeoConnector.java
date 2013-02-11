@@ -159,8 +159,13 @@ public class NuxeoConnector extends BaseDocumentService {
     }
 
     protected String getServerUrl() {
-        return "http://" + serverName + ":" + port + "/" + contextPath
-                + "/site/automation";
+
+        if (contextPath == null || contextPath.isEmpty()) {
+            return "http://" + serverName + ":" + port + "/" + "automation";
+        } else {
+            return "http://" + serverName + ":" + port + "/" + contextPath
+                    + "/site/automation";
+        }
     }
 
     /**
@@ -218,13 +223,15 @@ public class NuxeoConnector extends BaseDocumentService {
      * Runs a NXQL Query against repository, result is returned as a list of
      * pages of Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:query}
+     * 
      * @param query the NXQL Query
      * @param page the page number
      * @param pageSize the page size
      * @param queryParams the query parameters if any
      * @param sortInfo sort columns
      * @return a batched list of Documents
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Documents query(@Placement(group = "operation parameters")
@@ -241,6 +248,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Optional
     @FriendlyName("Sort columns")
     List<String> sortInfo) throws Exception {
+        System.out.println("Execute simple query on " + query);
         return (Documents) execPageProvider(null, query, page, pageSize,
                 queryParams, sortInfo, false);
     }
@@ -249,13 +257,16 @@ public class NuxeoConnector extends BaseDocumentService {
      * Runs a NXQL Query against repository, result is returned as a list of
      * pages of Records
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:query-and-fetch}
+     * 
      * @param query the NXQL Query
      * @param page the page number
      * @param pageSize the page size
      * @param queryParams the query parameters if any
      * @param sortInfo sort columns
      * @return a batched list of Records
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
 
     @Processor
@@ -281,13 +292,15 @@ public class NuxeoConnector extends BaseDocumentService {
      * Runs a Page Provider (named query) against repository, result is returned
      * as a list of pages of Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:page-provider}
+     * 
      * @param pageProviderName the name if the PagteProvider to run
      * @param page the page number
      * @param pageSize the page size
      * @param queryParams the query parameters if any
      * @param sortInfo sort columns
      * @return a batched list of Documents
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Documents pageProvider(@Placement(group = "operation parameters")
@@ -318,9 +331,8 @@ public class NuxeoConnector extends BaseDocumentService {
         } else {
             request = session.newRequest("Document.PageProvider");
         }
-        OperationDocumentation opDef = request.getOperation();
 
-        if (query == null || query.isEmpty()) {
+        if (query != null && !query.isEmpty()) {
             request.set("query", query);
         } else {
             request.set("providerName", pageProvider);
@@ -341,11 +353,13 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * Executes an arbitrary operation
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:run-operation}
+     * 
      * @param operationName Name of the Automation Operation
      * @param input Input of the Operation
      * @param params Parameters of the Operation
      * @return Result of the Operation
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Object runOperation(@Placement(group = "operation parameters")
@@ -396,6 +410,8 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * Creates a Blob from a File
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:file-to-blob}
+     * 
      * @param file the input File
      * @return the Blob wrapping the File
      */
@@ -407,7 +423,10 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * Creates a Blob from a String
      * 
-     * @param file the input String
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:string-to-blob}
+     * 
+     * @param input the input String
      * @return the Blob wrapping the String
      */
     @Transformer(sourceTypes = { String.class })
@@ -417,6 +436,9 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Convert a Document to a Simple Map
+     * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:document-to-map}
      * 
      * @param doc the Document to convert
      * @return the resulting Map<String, Object>
@@ -438,6 +460,9 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Converts a list of Documents into a simple list of Map
+     * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:documents-to-list-of-map}
      * 
      * @param docs the Documents list to convert
      * @return the resulting List of Map

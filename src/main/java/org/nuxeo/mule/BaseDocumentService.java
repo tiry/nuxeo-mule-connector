@@ -33,9 +33,11 @@ public class BaseDocumentService {
     /**
      * Get a Document from Nuxeo repository
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-document}
+     * 
      * @param docRef the DocumentRef
      * @return a Document Object
-     * @throws Exception in case of error
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document getDocument(@Placement(group = "operation parameters")
@@ -47,8 +49,11 @@ public class BaseDocumentService {
     /**
      * Get the root Document of Nuxeo Repository
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:get-root-document}
+     * 
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document getRootDocument() throws Exception {
@@ -58,12 +63,15 @@ public class BaseDocumentService {
     /**
      * Create a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:create-document}
+     * 
      * @param parentRef reference of the Parent document
      * @param docType Document Type
      * @param docName name of the target Document
      * @param properties Metadata
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document createDocument(@Placement(group = "operation parameters")
@@ -83,8 +91,10 @@ public class BaseDocumentService {
     /**
      * Deletes a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:remove}
+     * 
      * @param ref reference of the Document to delete
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public void remove(@Placement(group = "operation parameters")
@@ -95,11 +105,13 @@ public class BaseDocumentService {
     /**
      * Copy a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:copy}
+     * 
      * @param src reference of the source document
      * @param targetParent reference of the destination document
      * @param docName name of the copied document
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document copy(@Placement(group = "operation parameters")
@@ -119,11 +131,13 @@ public class BaseDocumentService {
     /**
      * Move a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:move}
+     * 
      * @param src the reference of the document to move
      * @param targetParent the reference of thr target parent
      * @param docName the name of the document after move
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document move(@Placement(group = "operation parameters")
@@ -143,9 +157,11 @@ public class BaseDocumentService {
     /**
      * Retrieves children of a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-children}
+     * 
      * @param docRef Reference of the parent Document
      * @return a Documents List
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Documents getChildren(@Placement(group = "operation parameters")
@@ -154,12 +170,14 @@ public class BaseDocumentService {
     }
 
     /**
-     * Get a children
+     * Get a child by it's name from a container
+     * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-child}
      * 
      * @param docRef reference of the parent Document
      * @param docName name of the child to fetch
      * @return a Document Objects
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document getChild(@Placement(group = "operation parameters")
@@ -171,9 +189,11 @@ public class BaseDocumentService {
     /**
      * Get Parent Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-parent}
+     * 
      * @param docRef reference of the Document
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document getParent(@Placement(group = "operation parameters")
@@ -184,13 +204,16 @@ public class BaseDocumentService {
     /**
      * Set Permission
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:set-permission}
+     * 
      * @param doc reference of the target Document
      * @param user username or groupname to give permission to
      * @param permission permissionname
      * @param acl ACL
      * @param granted grant/deny flag
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document setPermission(@Placement(group = "operation parameters")
@@ -206,10 +229,12 @@ public class BaseDocumentService {
     /**
      * Removes an ACL
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:remove-acl}
+     * 
      * @param doc reference of the target Document
      * @param acl ACL
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document removeAcl(@Placement(group = "operation parameters")
@@ -221,10 +246,12 @@ public class BaseDocumentService {
     /**
      * Set Lifecycle State
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:set-state}
+     * 
      * @param doc reference to the target Document
      * @param state LifeCycle State
      * @return a Document Object
-     * @throws Exceptions
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document setState(@Placement(group = "operation parameters")
@@ -237,10 +264,12 @@ public class BaseDocumentService {
     /**
      * Locks a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:lock}
+     * 
      * @param doc target Document
      * @param lock lock info (can be null)
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document lock(@Placement(group = "operation parameters")
@@ -256,9 +285,11 @@ public class BaseDocumentService {
     /**
      * Unlocks a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:unlock}
+     * 
      * @param doc reference to the target Document
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document unlock(@Placement(group = "operation parameters")
@@ -269,11 +300,13 @@ public class BaseDocumentService {
     /**
      * Change a property on a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:set-property}
+     * 
      * @param doc reference to the target Document
      * @param key property Name
      * @param value property Value
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document setProperty(@Placement(group = "operation parameters")
@@ -286,10 +319,13 @@ public class BaseDocumentService {
     /**
      * Remove a Property on a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:remove-property}
+     * 
      * @param doc reference to the target Document
      * @param key property name
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document removeProperty(@Placement(group = "operation parameters")
@@ -301,10 +337,12 @@ public class BaseDocumentService {
     /**
      * Updates a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:update}
+     * 
      * @param doc reference to the target Document
      * @param properties Map of properties to set on document
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document update(@Placement(group = "operation parameters")
@@ -316,11 +354,13 @@ public class BaseDocumentService {
     /**
      * Publish a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:publish}
+     * 
      * @param doc reference to the target Document
      * @param section reference of the publish target
      * @param override flag to control override
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document publish(@Placement(group = "operation parameters")
@@ -336,11 +376,14 @@ public class BaseDocumentService {
     /**
      * Create a Relation
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:create-relation}
+     * 
      * @param subject reference to the target Document
      * @param predicate predicate of the relation
      * @param object reference on the target related Document
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document createRelation(@Placement(group = "operation parameters")
@@ -351,14 +394,16 @@ public class BaseDocumentService {
     }
 
     /**
-     * get Relations
+     * get Relations on the target Document
+     * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-relations}
      * 
      * @param doc reference to the target Document
      * @param predicate predicate to search for
      * @param outgoing flag to indicate of relations processed must be outgoing
      *            or incoming
      * @return list of linked Document Objects
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Documents getRelations(@Placement(group = "operation parameters")
@@ -371,10 +416,12 @@ public class BaseDocumentService {
     /**
      * Attach a Blob to a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:set-blob}
+     * 
      * @param doc reference to the target Document
      * @param blob Blob to attach
      * @param xpath Xpath of the target property
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public void setBlob(@Placement(group = "operation parameters")
@@ -394,9 +441,11 @@ public class BaseDocumentService {
     /**
      * Remove a Blob from a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:remove-blob}
+     * 
      * @param doc reference to the target Document
      * @param xpath xpath of the target Blob
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public void removeBlob(@Placement(group = "operation parameters")
@@ -415,10 +464,12 @@ public class BaseDocumentService {
     /**
      * get the Blob associated to a Document
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-blob}
+     * 
      * @param doc reference to the target Document
      * @param xpath xpath of the target Blob
      * @return a FileBlob object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public FileBlob getBlob(@Placement(group = "operation parameters")
@@ -437,10 +488,13 @@ public class BaseDocumentService {
     /**
      * Creates a version
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:create-version}
+     * 
      * @param doc reference to the target Document
      * @param increment increment policy (minor/major)
      * @return a Document Object
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public Document createVersion(@Placement(group = "operation parameters")
@@ -459,9 +513,11 @@ public class BaseDocumentService {
     /**
      * Fire an Event
      * 
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:fire-event}
+     * 
      * @param event name of the event to raise
      * @param doc reference to the document to attach to the event
-     * @throws Exception
+     * @throws Exception if operation can not be executed
      */
     @Processor
     public void fireEvent(@Placement(group = "operation parameters")

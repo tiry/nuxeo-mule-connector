@@ -12,7 +12,11 @@
         http://www.mulesoft.org/schema/mule/nuxeo http://www.mulesoft.org/schema/mule/nuxeo/1.0-SNAPSHOT/mule-nuxeo.xsd
         http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-    <nuxeo:config name="NuxeoServer" username="Administrator" password="Administrator" serverName="localhost" port="8080" contextPath="nuxeo" />
+    <nuxeo:config name="NuxeoServer" username="Administrator" password="Administrator" serverName="localhost" port="18080" contextPath="" defaultSchemas="common,dublincore,file" />
+
+    <flow name="nuxeoTestFlow0" doc:name="nuxeoTestFlow0">
+        <nuxeo:query config-ref="NuxeoServer" query="Select * from Document" doc:name="Query"/>
+    </flow>
 
     <flow name="nuxeoTestFlow1" doc:name="nuxeoTestFlow1">
         <nuxeo:create-document config-ref="NuxeoServer" doc:name="Create Doc" docName="mulews" docType="Workspace" parentRef="/default-domain/workspaces">
@@ -27,7 +31,7 @@
                 <nuxeo:property key="dc:description">Some nice description</nuxeo:property>
             </nuxeo:properties>
         </nuxeo:update>
-        <nuxeo:query config-ref="NuxeoServer" query="Select * from Document where dc:source='mule' order by dc:created DESC" doc:name="Query"/>
+        <nuxeo:query config-ref="NuxeoServer" query="Select * from Workspace where dc:source='mule' order by dc:created ASC" doc:name="Query"/>
         <set-payload value="#[payload.get(0)]" doc:name="get First Document"/>
     </flow>
 

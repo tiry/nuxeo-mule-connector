@@ -1,3 +1,131 @@
-<!-- BEGIN_INCLUDE(nuxeo:my-processor) -->
-    <nuxeo:my-processor content="#[map-payload:content]" />
-<!-- END_INCLUDE(nuxeo:my-processor) -->
+<!-- BEGIN_INCLUDE(nuxeo:query) -->
+    <nuxeo:query config-ref="NuxeoServer" query="Select * from Document where dc:source='mule' order by dc:created DESC"/>
+<!-- END_INCLUDE(nuxeo:query) -->
+<!-- BEGIN_INCLUDE(nuxeo:query-and-fetch) -->
+    <nuxeo:query-and-fetch config-ref="NuxeoServer" query="Select dc:title,tc:description from Document where dc:source='mule' order by dc:created DESC"/>
+<!-- END_INCLUDE(nuxeo:query-and-fetch) -->
+<!-- BEGIN_INCLUDE(nuxeo:page-provider) -->
+    <nuxeo:page-provider config-ref="NuxeoServer" pageProviderName="user_documents"/>
+<!-- END_INCLUDE(nuxeo:page-provider) -->
+<!-- BEGIN_INCLUDE(nuxeo:run-operation) -->
+ <nuxeo:run-operation config-ref="NuxeoServer" operationName="Document.Create" input-ref="/default-domain/workspaces" >
+            <nuxeo:params>
+                <nuxeo:param key="type">File</nuxeo:param>
+                <nuxeo:param key="name">newDoc</nuxeo:param>
+            </nuxeo:params>
+ </nuxeo:run-operation>
+<!-- END_INCLUDE(nuxeo:run-operation) -->
+<!-- BEGIN_INCLUDE(nuxeo:copy) -->
+  <nuxeo:copy config-ref="NuxeoServer"    docName="copyOfDoc1" src="/folder1/doc1" targetParent="/folder2"/>
+<!-- END_INCLUDE(nuxeo:copy) -->
+<!-- BEGIN_INCLUDE(nuxeo:create-document) -->
+   <nuxeo:create-document config-ref="NuxeoServer" docName="mulews" docType="Workspace" parentRef="/default-domain/workspaces">
+            <nuxeo:properties>
+                <nuxeo:property key="dc:title">Mule Workspace</nuxeo:property>
+            </nuxeo:properties>
+   </nuxeo:create-document>
+<!-- END_INCLUDE(nuxeo:create-document) -->
+<!-- BEGIN_INCLUDE(nuxeo:create-relation) -->
+   <nuxeo:create-relation config-ref="NuxeoServer"    object-ref="/targetDoc" predicate="http://purl.org/dc/terms/Requires" subject="/sourceDoc"/>
+<!-- END_INCLUDE(nuxeo:create-relation) -->
+<!-- BEGIN_INCLUDE(nuxeo:create-version) -->
+   <nuxeo:create-version config-ref="NuxeoServer"    doc="/path/to/doc/toversion" increment="Major"/>
+<!-- END_INCLUDE(nuxeo:create-version) -->
+<!-- BEGIN_INCLUDE(nuxeo:fire-event) -->
+   <nuxeo:fire-event config-ref="NuxeoServer"    doc="/path/to/doc/toversion" event="EventName"></nuxeo:fire-event>
+<!-- END_INCLUDE(nuxeo:fire-event) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-blob) -->
+ <nuxeo:get-blob config-ref="NuxeoServer"    doc="/path/to/doc/" xpath="file:content"></nuxeo:get-blob>
+<!-- END_INCLUDE(nuxeo:get-blob) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-child) -->
+  <nuxeo:get-child config-ref="NuxeoServer"    docName="childName" docRef="/path/to/folder"></nuxeo:get-child>
+<!-- END_INCLUDE(nuxeo:get-child) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-children) -->
+   <nuxeo:get-children config-ref="NuxeoServer"     docRef="/path/to/folder">
+        </nuxeo:get-children>
+<!-- END_INCLUDE(nuxeo:get-children) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-document) -->
+  <nuxeo:get-document config-ref="NuxeoServer"     docRef="/path/to/doc">
+        </nuxeo:get-document>
+<!-- END_INCLUDE(nuxeo:get-document) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-parent) -->
+ <nuxeo:get-parent config-ref="NuxeoServer"     docRef="/path/to/doc">
+        </nuxeo:get-parent>
+<!-- END_INCLUDE(nuxeo:get-parent) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-relations) -->
+<nuxeo:get-relations config-ref="NuxeoServer"    doc="/path/to/doc" predicate="http://purl.org/dc/terms/Requires" outgoing="true">
+        </nuxeo:get-relations>
+<!-- END_INCLUDE(nuxeo:get-relations) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-root-document) -->
+ <nuxeo:get-root-document config-ref="NuxeoServer"     >
+        </nuxeo:get-root-document>
+<!-- END_INCLUDE(nuxeo:get-root-document) -->
+<!-- BEGIN_INCLUDE(nuxeo:lock) -->
+<nuxeo:lock config-ref="NuxeoServer"    doc="/path/to/doc" lock="lockInfo">
+        </nuxeo:lock>
+<!-- END_INCLUDE(nuxeo:lock) -->
+<!-- BEGIN_INCLUDE(nuxeo:move) -->
+ <nuxeo:move config-ref="NuxeoServer"    docName="targetDocName" src="/path/to/source" targetParent="/path/to/target/parent">
+        </nuxeo:move>
+<!-- END_INCLUDE(nuxeo:move) -->
+<!-- BEGIN_INCLUDE(nuxeo:publish) -->
+ <nuxeo:publish config-ref="NuxeoServer"    doc="/path/to/doc" section="/path/to/target/folder">
+        </nuxeo:publish>
+<!-- END_INCLUDE(nuxeo:publish) -->
+<!-- BEGIN_INCLUDE(nuxeo:remove) -->
+ <nuxeo:remove config-ref="NuxeoServer"    ref="/path/to/doc">
+        </nuxeo:remove>
+<!-- END_INCLUDE(nuxeo:remove) -->
+<!-- BEGIN_INCLUDE(nuxeo:remove-acl) -->
+ <nuxeo:remove-acl config-ref="NuxeoServer"    acl="local" doc="/path/to/doc">
+        </nuxeo:remove-acl>
+<!-- END_INCLUDE(nuxeo:remove-acl) -->
+<!-- BEGIN_INCLUDE(nuxeo:remove-blob) -->
+ <nuxeo:remove-blob config-ref="NuxeoServer"     doc="/path/to/doc" xpath="file:content">
+        </nuxeo:remove-blob>
+<!-- END_INCLUDE(nuxeo:remove-blob) -->
+<!-- BEGIN_INCLUDE(nuxeo:remove-property) -->
+ <nuxeo:remove-property config-ref="NuxeoServer"     doc="/path/to/doc" key="dc:description">
+        </nuxeo:remove-property>
+<!-- END_INCLUDE(nuxeo:remove-property) -->
+<!-- BEGIN_INCLUDE(nuxeo:set-blob) -->
+ <nuxeo:set-blob config-ref="NuxeoServer"     doc="/path/to/doc" blob-ref="BlobObject" xpath="file:content">
+        </nuxeo:set-blob>
+<!-- END_INCLUDE(nuxeo:set-blob) -->
+<!-- BEGIN_INCLUDE(nuxeo:set-permission) -->
+ <nuxeo:set-permission config-ref="NuxeoServer"     doc="/path/to/doc" acl="local" permission="READ" user="userName" granted="true">
+        </nuxeo:set-permission>
+<!-- END_INCLUDE(nuxeo:set-permission) -->
+<!-- BEGIN_INCLUDE(nuxeo:set-property) -->
+  <nuxeo:set-property config-ref="NuxeoServer"     doc="/path/to/doc" key="dc:description" value="a nice description">
+        </nuxeo:set-property>
+<!-- END_INCLUDE(nuxeo:set-property) -->
+<!-- BEGIN_INCLUDE(nuxeo:set-state) -->
+ <nuxeo:set-state config-ref="NuxeoServer"     doc="/path/to/doc" state="deleted">
+        </nuxeo:set-state>
+<!-- END_INCLUDE(nuxeo:set-state) -->
+<!-- BEGIN_INCLUDE(nuxeo:unlock) -->
+  <nuxeo:unlock config-ref="NuxeoServer"     doc="/path/to/doc" >
+        </nuxeo:unlock>
+<!-- END_INCLUDE(nuxeo:unlock) -->
+<!-- BEGIN_INCLUDE(nuxeo:update) -->
+  <nuxeo:update config-ref="NuxeoServer"     doc="/path/to/doc" >
+            <nuxeo:properties>
+                <nuxeo:property key="dc:title">new title</nuxeo:property>
+                <nuxeo:property key="dc:description">new description</nuxeo:property>
+            </nuxeo:properties>
+        </nuxeo:update>
+<!-- END_INCLUDE(nuxeo:update) -->
+
+<!-- BEGIN_INCLUDE(nuxeo:document-to-map) -->
+  <nuxeo:document-to-map />
+<!-- END_INCLUDE(nuxeo:document-to-map) -->
+<!-- BEGIN_INCLUDE(nuxeo:documents-to-list-of-map) -->
+   <nuxeo:documents-to-list-of-map />
+<!-- END_INCLUDE(nuxeo:documents-to-list-of-map) -->
+<!-- BEGIN_INCLUDE(nuxeo:file-to-blob) -->
+  <nuxeo:file-to-blob />
+<!-- END_INCLUDE(nuxeo:file-to-blob) -->
+<!-- BEGIN_INCLUDE(nuxeo:string-to-blob) -->
+ <nuxeo:string-to-blob />
+<!-- END_INCLUDE(nuxeo:string-to-blob) -->
