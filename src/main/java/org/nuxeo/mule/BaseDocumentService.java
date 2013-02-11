@@ -22,7 +22,7 @@ import org.nuxeo.ecm.automation.client.model.PropertyMap;
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
  * 
  */
-public class BaseDocumentService {
+public class BaseDocumentService extends BaseNuxeoModule {
 
     protected DocumentService docService;
 

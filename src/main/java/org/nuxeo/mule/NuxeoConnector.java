@@ -23,19 +23,16 @@ import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
-import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
-import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
-import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
 import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
+import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
-import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 
 /**
  * Connector that uses Nuxeo Automation java client to leverage Nuxeo Rest API
@@ -47,27 +44,6 @@ import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 public class NuxeoConnector extends BaseDocumentService {
 
     /**
-     * Nuxeo Server name (IP or DNS name)
-     */
-    @Configurable
-    @Placement(group = "Connection")
-    private String serverName;
-
-    /**
-     * Port used to connect to Nuxeo Server
-     */
-    @Configurable
-    @Placement(group = "Connection")
-    private String port;
-
-    /**
-     * Context Path for Nuxeo instance
-     */
-    @Configurable
-    @Placement(group = "Connection")
-    private String contextPath = "nuxeo";
-
-    /**
      * comma separated String listing schemas that must be sent by the server
      * when returning Documents
      */
@@ -75,8 +51,6 @@ public class NuxeoConnector extends BaseDocumentService {
     @Optional
     @Placement(group = "Marshaling")
     private String defaultSchemas = null;
-
-    private Session session;
 
     public NuxeoConnector() {
         serverName = "localhost";
@@ -105,65 +79,6 @@ public class NuxeoConnector extends BaseDocumentService {
     }
 
     /**
-     * get Nuxeo Server Name
-     * 
-     * @return Nuxeo Server Name
-     */
-    public String getServerName() {
-        return serverName;
-    }
-
-    /**
-     * get Nuxeo Server Port
-     * 
-     * @return Nuxeo Server Port
-     */
-    public String getPort() {
-        return port;
-    }
-
-    /**
-     * get Nuxeo Server Context pat
-     * 
-     * @return Nuxeo Server Context path
-     */
-    public String getContextPath() {
-        return contextPath;
-    }
-
-    /**
-     * set Nuxeo Server name
-     * 
-     * @param serverName
-     */
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-    }
-
-    /**
-     * set port used to connect to Nuxeo Server
-     * 
-     * @param port
-     */
-    public void setPort(String port) {
-        this.port = port;
-    }
-
-    /**
-     * set Context path of the target Nuxeo Server
-     * 
-     * @param contextPath
-     */
-    public void setContextPath(String contextPath) {
-        this.contextPath = contextPath;
-    }
-
-    protected String getServerUrl() {
-        return "http://" + serverName + ":" + port + "/" + contextPath
-                + "/site/automation";
-    }
-
-    /**
      * Connect to Nuxeo Server via Automation java client
      * 
      * @param username Nuxeo user name
@@ -174,8 +89,7 @@ public class NuxeoConnector extends BaseDocumentService {
     public void connect(@ConnectionKey
     String username, @Password
     String password) throws ConnectionException {
-        AutomationClient client = new HttpAutomationClient(getServerUrl());
-        session = client.getSession(username, password);
+        openAutomationSession(username, password);
         session.setDefaultSchemas(defaultSchemas);
         docService = session.getAdapter(DocumentService.class);
     }
@@ -185,9 +99,7 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Disconnect
     public void disconnect() {
-        if (session != null) {
-            session.close();
-        }
+        closeAutomationSession();
     }
 
     /**
