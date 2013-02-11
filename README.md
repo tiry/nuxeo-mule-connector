@@ -1,8 +1,17 @@
 
-This is a sample Nuxeo Connector for Mule.
+This is a Nuxeo Connector for Mule that is based on Automation API.
 
-It is based on Nuxeo Automation API.
+Compared to CMIS it allows full access to Nuxeo API :
 
+ - all the features that are not available via CMIS (complex properties, multi-blobs ...)
+ - additional Custom Automation Operation (contributed via Nuxexo IDE)
+ - additional Custom Automation Chains (contributed via Nuxeo Studio)
+
+This connector exposes :
+
+ - a predefined set of Operations
+ - a runOperation that allows to call any Operation or Chain
+ - some converters to manage Nuxeo Automation objects 
 
 ## To build the plugin
 
