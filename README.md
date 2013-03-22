@@ -13,7 +13,7 @@ This includes :
  - converters
 
 but also
- 
+
  - all the features that are not available via CMIS (complex properties, multi-blobs ...)
  - additional Custom Automation Operation (contributed via Nuxexo IDE)
  - additional Custom Automation Chains (contributed via Nuxeo Studio)
@@ -22,22 +22,23 @@ This connector exposes :
 
  - a predefined set of Operations
  - a runOperation that allows to call any Operation or Chain defined on the server
- - some converters to manage Nuxeo Automation objects 
+ - some converters to manage Nuxeo Automation objects
 
 ## To build the plugin
 
-Quick build 
+Quick build
 
-> mvn -Ddevkit.studio.package.skip=false -Ddevkit.javadoc.check.skip -DskipTests=true  -Dmaven.test.skip=true clean package
+> mvn -Ddevkit.studio.package.skip=false -Ddevkit.javadoc.check.skip -DskipTests=true -Dmaven.test.skip=true clean package [-Djava7.home=/path/to/java7]
 
 Build with tests
 
-> mvn -Ddevkit.studio.package.skip=false  clean package
+> mvn -Ddevkit.studio.package.skip=false clean package [-Djava7.home=/path/to/java7]
 
 
 Then use the update site generated in target/update-site to load the plugin from MuleStudio
 
-NB : You have to use Maven 3 and Java 6 (you can 'source' env.sh for that)
+NB: You have to use Maven 3 and Java 6 (you can 'source' env.sh for that)
+but the tests require Java 7 so you must also provide the path to the Java 7 if different than the default value (/usr/lib/jvm/jdk1.7.0_10).
 
 ## Update site
 
