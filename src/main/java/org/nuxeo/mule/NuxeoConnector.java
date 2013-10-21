@@ -362,7 +362,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @return Result of the Operation
      * @throws Exception if operation can not be executed
      */
-    @Processor
+    //@Processor
     public Object runOperation(@Placement(group = "operation parameters")
     String operationName, @Placement(group = "operation parameters")
     @Optional
