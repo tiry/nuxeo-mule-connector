@@ -5,6 +5,7 @@ package org.nuxeo.mule;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,9 +40,9 @@ import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 
 /**
  * Connector that uses Nuxeo Automation java client to leverage Nuxeo Rest API
- * 
+ *
  * @author <a href="mailto:tdelprat@nuxeo.com">Tiry</a>
- * 
+ *
  */
 @Connector(name = "nuxeo", schemaVersion = "1.0-SNAPSHOT")
 public class NuxeoConnector extends BaseDocumentService {
@@ -87,7 +88,7 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * get the default schemas that should be set by the server when sending
      * Documents
-     * 
+     *
      * @return comma separated String listing schemas
      */
     public String getDefaultSchemas() {
@@ -97,7 +98,7 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * set the default schemas that should be set by the server when sending
      * Documents
-     * 
+     *
      * @param defaultSchemas comma separated String listing schemas
      */
     public void setDefaultSchemas(String defaultSchemas) {
@@ -106,7 +107,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * get Nuxeo Server Name
-     * 
+     *
      * @return Nuxeo Server Name
      */
     public String getServerName() {
@@ -115,7 +116,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * get Nuxeo Server Port
-     * 
+     *
      * @return Nuxeo Server Port
      */
     public String getPort() {
@@ -124,7 +125,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * get Nuxeo Server Context pat
-     * 
+     *
      * @return Nuxeo Server Context path
      */
     public String getContextPath() {
@@ -133,7 +134,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * set Nuxeo Server name
-     * 
+     *
      * @param serverName
      */
     public void setServerName(String serverName) {
@@ -142,7 +143,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * set port used to connect to Nuxeo Server
-     * 
+     *
      * @param port
      */
     public void setPort(String port) {
@@ -151,7 +152,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * set Context path of the target Nuxeo Server
-     * 
+     *
      * @param contextPath
      */
     public void setContextPath(String contextPath) {
@@ -170,7 +171,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Connect to Nuxeo Server via Automation java client
-     * 
+     *
      * @param username Nuxeo user name
      * @param password Nuxeo password
      * @throws ConnectionException
@@ -197,7 +198,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Are we connected
-     * 
+     *
      * @return true if an Automation Session is active
      */
     @ValidateConnection
@@ -207,7 +208,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Are we connected
-     * 
+     *
      * @return fake ConnectionId based on serverUrl and username
      */
     @ConnectionIdentifier
@@ -222,9 +223,9 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * Runs a NXQL Query against repository, result is returned as a list of
      * pages of Document
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:query}
-     * 
+     *
      * @param query the NXQL Query
      * @param page the page number
      * @param pageSize the page size
@@ -256,10 +257,10 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * Runs a NXQL Query against repository, result is returned as a list of
      * pages of Records
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
      * nuxeo:query-and-fetch}
-     * 
+     *
      * @param query the NXQL Query
      * @param page the page number
      * @param pageSize the page size
@@ -291,9 +292,9 @@ public class NuxeoConnector extends BaseDocumentService {
     /**
      * Runs a Page Provider (named query) against repository, result is returned
      * as a list of pages of Document
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:page-provider}
-     * 
+     *
      * @param pageProviderName the name if the PagteProvider to run
      * @param page the page number
      * @param pageSize the page size
@@ -352,9 +353,9 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Executes an arbitrary operation
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:run-operation}
-     * 
+     *
      * @param operationName Name of the Automation Operation
      * @param input Input of the Operation
      * @param params Parameters of the Operation
@@ -403,15 +404,15 @@ public class NuxeoConnector extends BaseDocumentService {
      * @Mime(MimeTypes.JSON)
      * @Transformer(sourceTypes = { Document.class }) public static String
      *                          documentToJSON(Document doc) {
-     * 
+     *
      *                          return null; }
      **/
 
     /**
      * Creates a Blob from a File
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:file-to-blob}
-     * 
+     *
      * @param file the input File
      * @return the Blob wrapping the File
      */
@@ -422,10 +423,10 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Creates a Blob from a String
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
      * nuxeo:string-to-blob}
-     * 
+     *
      * @param input the input String
      * @return the Blob wrapping the String
      */
@@ -436,16 +437,16 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Convert a Document to a Simple Map
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
      * nuxeo:document-to-map}
-     * 
+     *
      * @param doc the Document to convert
      * @return the resulting Map<String, Object>
      */
     @Transformer(sourceTypes = { Document.class })
     public static Map<String, Object> documentToMap(Document doc) {
-        Map<String, Object> map = doc.getProperties().map();
+        Map<String, Object> map = new HashMap<String, Object>(doc.getProperties().map());
         map.put("type", doc.getType());
         map.put("facets", doc.getFacets().list());
         map.put("id", doc.getId());
@@ -460,10 +461,10 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /**
      * Converts a list of Documents into a simple list of Map
-     * 
+     *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
      * nuxeo:documents-to-list-of-map}
-     * 
+     *
      * @param docs the Documents list to convert
      * @return the resulting List of Map
      */
