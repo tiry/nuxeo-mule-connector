@@ -16,7 +16,7 @@ import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
-import org.nuxeo.ecm.automation.test.RestFeature;
+import org.nuxeo.ecm.automation.test.EmbeddedAutomationServerFeature;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
 import org.nuxeo.runtime.test.runner.Deploy;
@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 @RunWith(FeaturesRunner.class)
 @Deploy({ "org.nuxeo.ecm.platform.url.api", "org.nuxeo.ecm.platform.url.core",
         "org.nuxeo.ecm.platform.types.api", "org.nuxeo.ecm.platform.types.core" })
-@Features(RestFeature.class)
+@Features(EmbeddedAutomationServerFeature.class)
 @Jetty(port = 18080)
 @RepositoryConfig(cleanup = Granularity.CLASS)
 public class NuxeoConnectorTest extends FunctionalTestCase {
@@ -50,7 +50,7 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
     /**
      * Check that embedded Nuxeo server is actually started and able to respond
      * to Automation Calls
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -78,9 +78,9 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
 
     /**
      * Runs a simple Flow and verify the output
-     * 
+     *
      * @throws Exception
-     * 
+     *
      */
     @Test
     public void testSimpleFlow() throws Exception {
@@ -95,7 +95,7 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
 
     /**
      * Runs a simple Flow with Converters and verify the output
-     * 
+     *
      * @throws Exception
      * @since 5.7
      */
@@ -111,7 +111,7 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
 
     /**
      * Run the flow specified by name and assert equality on the expected output
-     * 
+     *
      * @param flowName The name of the flow to run
      * @param expect The expected output
      */
@@ -127,7 +127,7 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
     /**
      * Run the flow specified by name using the specified payload and assert
      * equality on the expected output
-     * 
+     *
      * @param flowName The name of the flow to run
      * @param expect The expected output
      * @param payload The payload of the input event
@@ -143,7 +143,7 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
 
     /**
      * Retrieve a flow by name from the registry
-     * 
+     *
      * @param name Name of the flow to retrieve
      */
     protected Flow lookupFlowConstruct(String name) {
