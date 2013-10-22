@@ -80,5 +80,5 @@ http://qa.nuxeo.org/jenkins/job/nuxeo-mule-connector-master/lastStableBuild/arti
 
  - integrate OAuth support
  - extend list of build-in functions (code gen ?)
- - provide a Mule EndPoint to listen to Nuxeo events (mainly packaging)
+ - provide a Mule EndPoint (@Source) to listen to Nuxeo events (mainly packaging)
 

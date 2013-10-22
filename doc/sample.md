@@ -54,6 +54,7 @@ XXX
 
 *    Follow installation steps.
 
+Alternatively, you can use the [update site provided by Nuxeo QA](https://qa.nuxeo.org/jenkins/job/nuxeo-mule-connector-master/lastSuccessfulBuild/artifact/target/update-site/)
 
 ### Step 3: Create Demo project
 
