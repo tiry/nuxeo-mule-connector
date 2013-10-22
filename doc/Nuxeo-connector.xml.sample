@@ -8,7 +8,7 @@
     <nuxeo:page-provider config-ref="NuxeoServer" pageProviderName="user_documents"/>
 <!-- END_INCLUDE(nuxeo:page-provider) -->
 <!-- BEGIN_INCLUDE(nuxeo:run-operation) -->
- <nuxeo:run-operation config-ref="NuxeoServer" operationName="Document.Create" input-ref="/default-domain/workspaces" >
+ <nuxeo:run-operation config-ref="NuxeoServer" operationId="Document.Create" input-ref="/default-domain/workspaces" >
             <nuxeo:params>
                 <nuxeo:param key="type">File</nuxeo:param>
                 <nuxeo:param key="name">newDoc</nuxeo:param>

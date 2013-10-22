@@ -52,14 +52,14 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Configurable
     @Placement(group = "Connection")
-    private String serverName;
+    private String serverName = "127.0.0.1";
 
     /**
      * Port used to connect to Nuxeo Server
      */
     @Configurable
     @Placement(group = "Connection")
-    private String port;
+    private String port = "8080";
 
     /**
      * Context Path for Nuxeo instance
@@ -75,7 +75,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Configurable
     @Optional
     @Placement(group = "Marshaling")
-    private String defaultSchemas = null;
+    private String defaultSchemas = "dublincore,common";
 
     private Session session;
 
@@ -356,20 +356,20 @@ public class NuxeoConnector extends BaseDocumentService {
      *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:run-operation}
      *
-     * @param operationName Name of the Automation Operation
+     * @param operationId Name of the Automation Operation
      * @param input Input of the Operation
      * @param params Parameters of the Operation
      * @return Result of the Operation
      * @throws Exception if operation can not be executed
      */
-    //@Processor
+    @Processor
     public Object runOperation(@Placement(group = "operation parameters")
-    String operationName, @Placement(group = "operation parameters")
+    String operationId, @Placement(group = "operation parameters")
     @Optional
     Object input, @Optional
     @Placement(group = "operation parameters")
     Map<String, String> params) throws Exception {
-        OperationRequest request = session.newRequest(operationName);
+        OperationRequest request = session.newRequest(operationId);
         OperationDocumentation opDef = request.getOperation();
 
         // fill operation parameter according to signature
