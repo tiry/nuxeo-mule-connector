@@ -116,6 +116,14 @@
             </nuxeo:properties>
         </nuxeo:update>
 <!-- END_INCLUDE(nuxeo:update) -->
+<!-- BEGIN_INCLUDE(nuxeo:register-listener) -->
+    <nuxeo:register-listener config-ref="NuxeoServer">
+            <nuxeo:event-names>
+                <nuxeo:event-name>documentCreated</nuxeo:event-name>
+                <nuxeo:event-name>documentModified</nuxeo:event-name>
+            </nuxeo:event-names>
+     </nuxeo:register-listener>
+<!-- END_INCLUDE(nuxeo:register-listener) -->
 
 <!-- BEGIN_INCLUDE(nuxeo:document-to-map) -->
   <nuxeo:document-to-map />
@@ -129,3 +137,5 @@
 <!-- BEGIN_INCLUDE(nuxeo:string-to-blob) -->
  <nuxeo:string-to-blob />
 <!-- END_INCLUDE(nuxeo:string-to-blob) -->
+
+

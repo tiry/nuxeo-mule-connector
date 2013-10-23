@@ -1,56 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xmlns:spring="http://www.springframework.org/schema/beans"
-      xmlns:nuxeo="http://www.mulesoft.org/schema/mule/nuxeo"
-      xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-      xmlns:json="http://www.mulesoft.org/schema/mule/json"
-      xsi:schemaLocation="
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:spring="http://www.springframework.org/schema/beans" xmlns:nuxeo="http://www.mulesoft.org/schema/mule/nuxeo"
+  xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+  xmlns:json="http://www.mulesoft.org/schema/mule/json"
+  xsi:schemaLocation="
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
         http://www.mulesoft.org/schema/mule/nuxeo http://www.mulesoft.org/schema/mule/nuxeo/1.0-SNAPSHOT/mule-nuxeo.xsd
         http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-    <nuxeo:config name="NuxeoServer" username="Administrator" password="Administrator" serverName="localhost" port="18080" contextPath="" defaultSchemas="common,dublincore,file" />
+  <nuxeo:config name="NuxeoServer" username="Administrator"
+    password="Administrator" serverName="localhost" port="18080"
+    contextPath="" defaultSchemas="common,dublincore,file" >
+        <nuxeo:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
+    </nuxeo:config>
 
-    <flow name="nuxeoTestFlow0" doc:name="nuxeoTestFlow0">
-        <nuxeo:query config-ref="NuxeoServer" query="Select * from Document" doc:name="Query"/>
-    </flow>
+  <flow name="nuxeoTestFlow0" doc:name="nuxeoTestFlow0">
+    <nuxeo:query config-ref="NuxeoServer" query="Select * from Document"
+      doc:name="Query" />
+  </flow>
 
-    <flow name="nuxeoTestFlow1" doc:name="nuxeoTestFlow1">
-        <nuxeo:create-document config-ref="NuxeoServer" doc:name="Create Doc" docName="mulews" docType="Workspace" parentRef="/default-domain/workspaces">
-            <nuxeo:properties>
-                <nuxeo:property key="dc:title">Mule Workspace</nuxeo:property>
-            </nuxeo:properties>
-        </nuxeo:create-document>
-        <nuxeo:get-document config-ref="NuxeoServer" docRef="#[payload.id]" doc:name="Get Document"/>
-        <nuxeo:update config-ref="NuxeoServer" doc="#[payload.id]" doc:name="Update Doc">
-            <nuxeo:properties>
-                <nuxeo:property key="dc:source">mule</nuxeo:property>
-                <nuxeo:property key="dc:description">Some nice description</nuxeo:property>
-            </nuxeo:properties>
-        </nuxeo:update>
-        <nuxeo:query config-ref="NuxeoServer" query="Select * from Workspace where dc:source='mule' order by dc:created ASC" doc:name="Query"/>
-        <set-payload value="#[payload.get(0)]" doc:name="get First Document"/>
-    </flow>
+  <flow name="nuxeoTestFlow1" doc:name="nuxeoTestFlow1">
+    <nuxeo:create-document config-ref="NuxeoServer"
+      doc:name="Create Doc" docName="mulews" docType="Workspace"
+      parentRef="/default-domain/workspaces">
+      <nuxeo:properties>
+        <nuxeo:property key="dc:title">Mule Workspace</nuxeo:property>
+      </nuxeo:properties>
+    </nuxeo:create-document>
+    <nuxeo:get-document config-ref="NuxeoServer"
+      docRef="#[payload.id]" doc:name="Get Document" />
+    <nuxeo:update config-ref="NuxeoServer" doc="#[payload.id]"
+      doc:name="Update Doc">
+      <nuxeo:properties>
+        <nuxeo:property key="dc:source">mule</nuxeo:property>
+        <nuxeo:property key="dc:description">Some nice description</nuxeo:property>
+      </nuxeo:properties>
+    </nuxeo:update>
+    <nuxeo:query config-ref="NuxeoServer"
+      query="Select * from Workspace where dc:source='mule' order by dc:created ASC"
+      doc:name="Query" />
+    <set-payload value="#[payload.get(0)]" doc:name="get First Document" />
+  </flow>
 
-    <flow name="nuxeoTestFlowWithConverter" doc:name="nuxeoTestFlowWithConverter">
-        <nuxeo:create-document config-ref="NuxeoServer" doc:name="Create Doc" docName="mulews" docType="Workspace" parentRef="/default-domain/workspaces">
-            <nuxeo:properties>
-                <nuxeo:property key="dc:title">Mule Workspace</nuxeo:property>
-            </nuxeo:properties>
-        </nuxeo:create-document>
-        <nuxeo:get-document config-ref="NuxeoServer" docRef="#[payload.id]" doc:name="Get Document"/>
-        <nuxeo:update config-ref="NuxeoServer" doc="#[payload.id]" doc:name="Update Doc">
-            <nuxeo:properties>
-                <nuxeo:property key="dc:source">mule</nuxeo:property>
-                <nuxeo:property key="dc:description">Some nice description</nuxeo:property>
-            </nuxeo:properties>
-        </nuxeo:update>
-        <nuxeo:query config-ref="NuxeoServer" query="Select * from Document where dc:source='mule' order by dc:created DESC" doc:name="Query"/>
-        <set-payload value="#[payload.get(0)]" doc:name="get First Document"/>
-        <nuxeo:document-to-map doc:name="Nuxeo"/>
-    </flow>
+  <flow name="nuxeoTestFlowWithConverter" doc:name="nuxeoTestFlowWithConverter">
+    <nuxeo:create-document config-ref="NuxeoServer"
+      doc:name="Create Doc" docName="mulews" docType="Workspace"
+      parentRef="/default-domain/workspaces">
+      <nuxeo:properties>
+        <nuxeo:property key="dc:title">Mule Workspace</nuxeo:property>
+      </nuxeo:properties>
+    </nuxeo:create-document>
+    <nuxeo:get-document config-ref="NuxeoServer"
+      docRef="#[payload.id]" doc:name="Get Document" />
+    <nuxeo:update config-ref="NuxeoServer" doc="#[payload.id]"
+      doc:name="Update Doc">
+      <nuxeo:properties>
+        <nuxeo:property key="dc:source">mule</nuxeo:property>
+        <nuxeo:property key="dc:description">Some nice description</nuxeo:property>
+      </nuxeo:properties>
+    </nuxeo:update>
+    <nuxeo:query config-ref="NuxeoServer"
+      query="Select * from Document where dc:source='mule' order by dc:created DESC"
+      doc:name="Query" />
+    <set-payload value="#[payload.get(0)]" doc:name="get First Document" />
+    <nuxeo:document-to-map doc:name="Nuxeo" />
+  </flow>
 
 </mule>
