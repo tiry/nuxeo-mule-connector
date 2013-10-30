@@ -12,10 +12,10 @@
     <mule.version>3.5.0-bighorn</mule.version>
     <mule.devkit.version>3.5.0-bighorn</mule.devkit.version>
     <junit.version>4.9</junit.version>
-    <mockito.version>1.8.2</mockito.version>
+    <mockito.version>1.9.5</mockito.version>
     <jdk.version>1.6</jdk.version>
-    <nuxeo.version>5.7-SNAPSHOT</nuxeo.version>
-    <java7.home>/usr/lib/jvm/jdk1.7.0_10/</java7.home>
+    <nuxeo.version>5.8-SNAPSHOT</nuxeo.version>
+    <!--<java7.home>/usr/lib/jvm/jdk1.7.0_10/</java7.home>-->
   </properties>
 
   <build>
@@ -69,7 +69,7 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
-            <jvm>${java7.home}/bin/java</jvm>
+            <!--<jvm>${java7.home}/bin/java</jvm>-->
           </configuration>
         </plugin>
         <plugin>

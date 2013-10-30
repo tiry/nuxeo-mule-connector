@@ -137,5 +137,7 @@
 <!-- BEGIN_INCLUDE(nuxeo:string-to-blob) -->
  <nuxeo:string-to-blob />
 <!-- END_INCLUDE(nuxeo:string-to-blob) -->
-
+<!-- BEGIN_INCLUDE(nuxeo:listen-to-events) -->
+<nuxeo:listen-to-events config-ref="Nuxeo"></nuxeo:listen-to-events>
+<!-- END_INCLUDE(nuxeo:listen-to-events) -->
 

@@ -10,21 +10,29 @@ import java.util.List;
 import java.util.Map;
 
 import org.mule.api.ConnectionException;
+import org.mule.api.MuleException;
+import org.mule.api.annotations.Category;
 import org.mule.api.annotations.Configurable;
 import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
+import org.mule.api.annotations.Source;
+import org.mule.api.annotations.SourceThreadingModel;
 import org.mule.api.annotations.Transformer;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
+import org.mule.api.annotations.display.Summary;
+import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
+import org.mule.api.callback.SourceCallback;
+import org.mule.api.callback.StopSourceCallback;
 import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
 import org.nuxeo.ecm.automation.client.Session;
@@ -35,9 +43,12 @@ import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
 import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
+import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
-import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
+import org.nuxeo.mule.poll.EventFilter;
+import org.nuxeo.mule.poll.EventPollingClient;
+import org.nuxeo.mule.poll.ListenerConfig;
 
 /**
  * Connector that uses Nuxeo Automation java client to leverage Nuxeo Rest API
@@ -53,6 +64,8 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Configurable
     @Placement(group = "Connection")
+    @Optional
+    @Default("127.0.0.1")
     private String serverName = "127.0.0.1";
 
     /**
@@ -60,6 +73,8 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Configurable
     @Placement(group = "Connection")
+    @Optional
+    @Default("8080")
     private String port = "8080";
 
     /**
@@ -67,7 +82,21 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Configurable
     @Placement(group = "Connection")
+    @Optional
+    @Default("nuxeo")
     private String contextPath = "nuxeo";
+
+    public void setPollingInterval(long pollingInterval) {
+        this.pollingInterval = pollingInterval;
+    }
+
+    public long getPollingInterval() {
+        return pollingInterval;
+    }
+
+    public List<ListenerConfig> getPendingListeners() {
+        return pendingListeners;
+    }
 
     /**
      * comma separated String listing schemas that must be sent by the server
@@ -76,9 +105,23 @@ public class NuxeoConnector extends BaseDocumentService {
     @Configurable
     @Optional
     @Placement(group = "Marshaling")
+    @Default("dublincore,common")
     private String defaultSchemas = "dublincore,common";
 
+    /**
+     * Define interval ued between polls to Nuxeo server to fetch events
+     */
+    @Configurable
+    @Placement(group = "Polling")
+    @Optional
+    @Default("5000")
+    private long pollingInterval = 5000;
+
     private Session session;
+
+    private List<ListenerConfig> pendingListeners = new ArrayList<ListenerConfig>();
+
+    protected EventPollingClient eventPollingClient;
 
     public NuxeoConnector() {
         serverName = "localhost";
@@ -185,6 +228,8 @@ public class NuxeoConnector extends BaseDocumentService {
         session = client.getSession(username, password);
         session.setDefaultSchemas(defaultSchemas);
         docService = session.getAdapter(DocumentService.class);
+
+        System.out.println("START!!");
     }
 
     /**
@@ -446,6 +491,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @return the Blob wrapping the File
      */
     @Transformer(sourceTypes = { File.class })
+    @Summary("converts a File to a Blob")
     public static FileBlob fileToBlob(File file) {
         return new FileBlob(file);
     }
@@ -460,6 +506,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @return the Blob wrapping the String
      */
     @Transformer(sourceTypes = { String.class })
+    @Summary("converts a String to a Blob")
     public static StringBlob stringToBlob(String input) {
         return new StringBlob(input);
     }
@@ -474,6 +521,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @return the resulting Map<String, Object>
      */
     @Transformer(sourceTypes = { Document.class })
+    @Summary("converts a Nuxeo document to a Map")
     public static Map<String, Object> documentToMap(Document doc) {
         Map<String, Object> map = new HashMap<String, Object>(
                 doc.getProperties().map());
@@ -499,12 +547,60 @@ public class NuxeoConnector extends BaseDocumentService {
      * @return the resulting List of Map
      */
     @Transformer(sourceTypes = { Documents.class })
+    @Summary("converts lists of documents to lists of Map")
     public static List<Map<String, Object>> documentsToListOfMap(Documents docs) {
         List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
         for (Document doc : docs) {
             result.add(documentToMap(doc));
         }
         return result;
+    }
+
+    @Start
+    public void init() throws MuleException {
+        System.out.println("START!!");
+        if (isConnected() && pendingListeners.size()>0) {
+            for (ListenerConfig config : pendingListeners) {
+                getPollingClient().subscribe(config);
+            }
+        }
+    }
+
+    protected EventPollingClient getPollingClient() {
+        if (eventPollingClient==null && session!=null) {
+            eventPollingClient = new EventPollingClient(session, pollingInterval);
+        }
+        return eventPollingClient;
+    }
+
+    /**
+     * Make Mule listen to Nuxeo events.
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:listen-to-events}
+     *
+     * @param callback the Mule CallBack
+     * @return
+     */
+    @Source(primaryNodeOnly = true, threadingModel = SourceThreadingModel.NONE)
+    @Summary("listen to events on a remote Nuxeo server")
+    public StopSourceCallback listenToEvents(
+            /*@Placement(group = "Events filtering") List<String> eventNames, @Placement(group = "Events filtering")  Map<EventFilter, String> filters,*/  final SourceCallback callback) {
+
+       ListenerConfig config = new ListenerConfig(null, callback);
+       if (this.isConnected()) {
+           getPollingClient().subscribe(config);
+       } else {
+           pendingListeners.add(config);
+           System.out.println("Pending Subscription");
+       }
+
+       return new StopSourceCallback() {
+            @Override
+            public void stop() throws Exception {
+                getPollingClient().unsubscribe();
+            }
+        };
     }
 
 }
