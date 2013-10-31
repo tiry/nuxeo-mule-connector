@@ -30,8 +30,32 @@ The Mule Connector architecture is static and as is can not expose all Nuxeo API
 This connector exposes :
 
  - a predefined set of Operations
+     - createDocument
+     - getDocument
+     - update
+     - ...
  - a runOperation that allows to call any Operation or Chain defined on the Nuxeo server
+     - allows to leverage custom Operations or Chains contributed by addons
  - some converters from Nuxeo objects (Document, Documents, Blob) to raw types (Maps, List of Maps, File ...)
+ - an event listener (@Source) that allows to make Mule listen to Nuxeo events
+     - it uses long polling http to fetch events from Audit log
+
+### DataSense
+
+For now, Nuxeo Connector does not use DataSense.
+
+DataSense seems to be designed to provide more info about objects returned by the API.
+
+This could indeed make sense for Nuxeo.
+
+However, this seems to be limited to Map type return type.
+
+Inside Nuxeo, this does not match :
+
+ - Document is a Java Object not a Map
+ - but Document contains a Map of Map that contains the schemas and fields that are dynamic
+
+This explains why for now it is not integrated.
 
 ## Nuxeo Connector vs CMIS Connector
 
@@ -52,7 +76,7 @@ but also
 
 ### Target Mule version
 
-XXX
+The connector uses the lastest Mule API, 3.5, since we use @Source.
 
 ### To build the plugin
 
@@ -75,10 +99,9 @@ Our QA Chain does publish an update site based on the latest build :
 
 http://qa.nuxeo.org/jenkins/job/nuxeo-mule-connector-master/lastStableBuild/artifact/target/update-site/
 
-
 ## Next steps
 
  - integrate OAuth support
  - extend list of build-in functions (code gen ?)
- - provide a Mule EndPoint (@Source) to listen to Nuxeo events (mainly packaging)
+
 
