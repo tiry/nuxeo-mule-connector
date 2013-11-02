@@ -17,6 +17,8 @@ import org.mule.api.annotations.Connect;
 import org.mule.api.annotations.ConnectionIdentifier;
 import org.mule.api.annotations.Connector;
 import org.mule.api.annotations.Disconnect;
+import org.mule.api.annotations.MetaDataKeyRetriever;
+import org.mule.api.annotations.MetaDataRetriever;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.Source;
 import org.mule.api.annotations.SourceThreadingModel;
@@ -33,6 +35,13 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.callback.StopSourceCallback;
+import org.mule.common.metadata.DefaultMetaData;
+import org.mule.common.metadata.DefaultMetaDataKey;
+import org.mule.common.metadata.MetaData;
+import org.mule.common.metadata.MetaDataKey;
+import org.mule.common.metadata.MetaDataModel;
+import org.mule.common.metadata.builder.DefaultMetaDataBuilder;
+import org.mule.common.metadata.builder.DynamicObjectBuilder;
 import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
 import org.nuxeo.ecm.automation.client.Session;
@@ -46,7 +55,7 @@ import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
-import org.nuxeo.mule.poll.EventFilter;
+import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
 import org.nuxeo.mule.poll.ListenerConfig;
 
@@ -122,6 +131,8 @@ public class NuxeoConnector extends BaseDocumentService {
     private List<ListenerConfig> pendingListeners = new ArrayList<ListenerConfig>();
 
     protected EventPollingClient eventPollingClient;
+
+    protected MetaDataIntrospector introspector;
 
     public NuxeoConnector() {
         serverName = "localhost";
@@ -281,6 +292,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @throws Exception if operation can not be executed
      */
     @Processor
+    @Category(name = "Query", description = "execute a NXQL Query")
     public Documents query(@Placement(group = "operation parameters")
     String query, @Placement(group = "operation parameters")
     @Optional
@@ -316,6 +328,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @throws Exception if operation can not be executed
      */
 
+    @Category(name = "Query", description = "execute a queryAndFetch")
     @Processor
     public RecordSet queryAndFetch(@Placement(group = "operation parameters")
     String query, @Placement(group = "operation parameters")
@@ -350,6 +363,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @throws Exception if operation can not be executed
      */
     @Processor
+    @Category(name = "Query", description = "execute a PageProvider")
     public Documents pageProvider(@Placement(group = "operation parameters")
     String pageProviderName, @Placement(group = "operation parameters")
     @Optional
@@ -409,6 +423,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @throws Exception if operation can not be executed
      */
     @Processor
+    @Category(name = "Automation RPC", description = "Call any Automation Operation or Chain")
     public Object runOperation(@Placement(group = "operation parameters")
     String operationId, @Placement(group = "operation parameters")
     @Optional
@@ -563,6 +578,7 @@ public class NuxeoConnector extends BaseDocumentService {
             for (ListenerConfig config : pendingListeners) {
                 getPollingClient().subscribe(config);
             }
+            introspector = new MetaDataIntrospector(session);
         }
     }
 
@@ -602,5 +618,43 @@ public class NuxeoConnector extends BaseDocumentService {
             }
         };
     }
+
+
+    // ******************************************************************
+    //
+    // Data Sense mapping
+    //
+    // For now, map MetaDataKey to Nuxeo doc types
+    //
+
+    protected MetaDataIntrospector getIntrospector() {
+        if (introspector==null) {
+            introspector = new MetaDataIntrospector(session);
+        }
+        return introspector;
+    }
+
+    @MetaDataKeyRetriever
+    public List<MetaDataKey> getMetaDataKeys() throws Exception {
+        List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
+        String[] nuxeoDocTypes = getIntrospector().getDocTypes();
+        for (String type : nuxeoDocTypes) {
+            keys.add(new DefaultMetaDataKey(type, type, false));
+        }
+        return keys;
+    }
+
+    @MetaDataRetriever
+    public MetaData getMetaData(MetaDataKey key) throws Exception {
+        String targetDocType = key.getId();
+        DynamicObjectBuilder dynamicObject = new DefaultMetaDataBuilder().createDynamicObject(key.getId());
+        for (String schema : getIntrospector().getSchemasForDocType(targetDocType)) {
+            getIntrospector().mapSchema(dynamicObject, schema);
+        }
+
+        MetaDataModel model = dynamicObject.build();
+        return new DefaultMetaData(model);
+    }
+
 
 }

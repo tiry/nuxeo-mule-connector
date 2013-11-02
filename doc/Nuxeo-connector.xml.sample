@@ -116,6 +116,14 @@
             </nuxeo:properties>
         </nuxeo:update>
 <!-- END_INCLUDE(nuxeo:update) -->
+<!-- BEGIN_INCLUDE(nuxeo:updateds) -->
+  <nuxeo:updateds config-ref="NuxeoServer"     type="File" doc="/path/to/doc" >
+            <nuxeo:properties>
+                <nuxeo:property key="dc:title">new title</nuxeo:property>
+                <nuxeo:property key="dc:description">new description</nuxeo:property>
+            </nuxeo:properties>
+        </nuxeo:updateds>
+<!-- END_INCLUDE(nuxeo:updateds) -->
 <!-- BEGIN_INCLUDE(nuxeo:register-listener) -->
     <nuxeo:register-listener config-ref="NuxeoServer">
             <nuxeo:event-names>

@@ -42,20 +42,41 @@ This connector exposes :
 
 ### DataSense
 
-For now, Nuxeo Connector does not use DataSense.
+The connector include a first level (very naive) implementation of DataSense for Nuxeo.
 
-DataSense seems to be designed to provide more info about objects returned by the API.
+As a start Nuxeo Document Types are mapped tp `MetaDataKey`.
 
-This could indeed make sense for Nuxeo.
+The only operation that was made DataSense aware for now is : `updateds` that is bascially a DataSense aware copy of `update`.
 
-However, this seems to be limited to Map type return type.
+About DataSense / Nuxeo mapping :
+
+**Stream**
+
+One specific type of Nuxeo field are `Blob`.
+
+As a first reflex, Blob are mappoed to `DataType.STREAM` but this DataType is deprecated, not sure what the replacement must be ...
+
+**Scalar vs Complex field**
+
+Inside Nuxeo, a Document object is constituted of schemas, that contains fields.
+
+The fields can be : 
+
+ - scalar : String, Long, Date ...
+ - List of scalar : List  of String, List of Date ...
+ - Complex type : can be almost any complex type as defined in the XSD standard, basically it means that a field that can seen as a map of other fields with potentially a very deep nesting
+
+For now, the current implementation does only address the first case : scalar fields ...
+
+**Map vs Document**
+
+DataSense seems seems to be limited to Map type return type.
 
 Inside Nuxeo, this does not match :
 
  - Document is a Java Object not a Map
  - but Document contains a Map of Map that contains the schemas and fields that are dynamic
 
-This explains why for now it is not integrated.
 
 ## Nuxeo Connector vs CMIS Connector
 
