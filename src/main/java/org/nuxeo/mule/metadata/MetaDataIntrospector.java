@@ -27,21 +27,21 @@ public class MetaDataIntrospector {
 
     public String[] getSchemasForDocType(String docType) {
         if ("File".equals(docType)) {
-            return new String[] {"dublicore","common", "file"};
+            return new String[] {"dublincore","common", "file"};
         }
         if ("Note".equals(docType)) {
-            return new String[] {"dublicore","common", "note"};
+            return new String[] {"dublincore","common", "note"};
         }
         if ("Folder".equals(docType)) {
-            return new String[] {"dublicore","common"};
+            return new String[] {"dublincore","common"};
         }
         if ("Workspace".equals(docType)) {
-            return new String[] {"dublicore","common", "file"};
+            return new String[] {"dublincore","common", "file"};
         }
 
         // XXX
 
-        return new String[] {"dublicore","common"};
+        return new String[] {"dublincore","common"};
     }
 
     public DataType getDataType(String nxFieldType) {
