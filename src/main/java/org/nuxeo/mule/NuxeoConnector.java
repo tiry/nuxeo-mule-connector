@@ -45,10 +45,8 @@ import org.mule.common.metadata.builder.DefaultMetaDataBuilder;
 import org.mule.common.metadata.builder.DynamicObjectBuilder;
 import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
-import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
-import org.nuxeo.ecm.automation.client.model.Blob;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
@@ -58,6 +56,7 @@ import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StreamBlob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
+import org.nuxeo.mule.blob.NuxeoBlob;
 import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
 import org.nuxeo.mule.poll.ListenerConfig;
@@ -128,8 +127,6 @@ public class NuxeoConnector extends BaseDocumentService {
     @Optional
     @Default("5000")
     private long pollingInterval = 5000;
-
-    private Session session;
 
     private List<ListenerConfig> pendingListeners = new ArrayList<ListenerConfig>();
 
@@ -510,18 +507,16 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Transformer(sourceTypes = { File.class, FileInputStream.class })
     @Summary("converts a File to a Blob")
-    public static Blob fileToBlob(Object file) {
+    public static NuxeoBlob fileToBlob(Object file) {
         if (file instanceof File) {
-            return new FileBlob((File)file);
+            return new NuxeoBlob(new FileBlob((File)file));
         } else if (file instanceof FileInputStream) {
             FileInputStream stream = (FileInputStream) file;
-            return new StreamBlob(stream,"mule.blob", "application/octet-stream");
+            return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
         }
         return null;
 
     }
-
-
 
     /**
      * Creates a Blob from a String
@@ -534,8 +529,8 @@ public class NuxeoConnector extends BaseDocumentService {
      */
     @Transformer(sourceTypes = { String.class })
     @Summary("converts a String to a Blob")
-    public static StringBlob stringToBlob(String input) {
-        return new StringBlob(input);
+    public static NuxeoBlob stringToBlob(String input) {
+        return new NuxeoBlob(new StringBlob(input));
     }
 
     /**

@@ -9,12 +9,17 @@ import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.MetaDataKeyParam;
 import org.mule.api.annotations.param.Optional;
+import org.nuxeo.ecm.automation.client.Constants;
+import org.nuxeo.ecm.automation.client.OperationRequest;
+import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
+import org.nuxeo.ecm.automation.client.model.Blob;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
-import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.PropertyMap;
+import org.nuxeo.mule.blob.NuxeoBlob;
+
 
 /**
  * Stupid code to Map Operation already hard-coded in DocumentService.
@@ -27,6 +32,8 @@ import org.nuxeo.ecm.automation.client.model.PropertyMap;
 public class BaseDocumentService {
 
     protected DocumentService docService;
+
+    protected Session session;
 
     public BaseDocumentService() {
         super();
@@ -448,16 +455,18 @@ public class BaseDocumentService {
     @Processor
     public void setBlob(@Placement(group = "operation parameters")
     String doc, @Placement(group = "operation parameters")
-    FileBlob blob, @Optional
+    NuxeoBlob blob, @Optional
     @Default("")
     @Placement(group = "operation parameters")
     String xpath) throws Exception {
 
-        if (xpath == null || xpath.isEmpty()) {
-            docService.setBlob(new DocRef(doc), blob);
-        } else {
-            docService.setBlob(new DocRef(doc), blob, xpath);
+        OperationRequest req = session.newRequest(docService.SetBlob).setInput(blob).set(
+                "document", doc);
+        if (xpath != null) {
+            req.set("xpath", xpath);
         }
+        req.setHeader(Constants.HEADER_NX_VOIDOP, "true");
+        req.execute();
     }
 
     /**
@@ -494,18 +503,17 @@ public class BaseDocumentService {
      * @throws Exception if operation can not be executed
      */
     @Processor
-    public FileBlob getBlob(@Placement(group = "operation parameters")
+    public NuxeoBlob getBlob(@Placement(group = "operation parameters")
     String doc, @Placement(group = "operation parameters")
     @Optional
     @Default("")
     String xpath) throws Exception {
-
-        if (xpath == null || xpath.isEmpty()) {
-            return docService.getBlob(new DocRef(doc));
-        } else {
-            return docService.getBlob(new DocRef(doc), xpath);
+        OperationRequest req = session.newRequest(docService.GetBlob).setInput(doc);
+        if (xpath != null) {
+            req.set("xpath", xpath);
         }
-    }
+        return new NuxeoBlob((Blob) req.execute());
+     }
 
     /**
      * Creates a version
