@@ -4,6 +4,7 @@
 package org.nuxeo.mule;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.nuxeo.ecm.automation.client.OperationRequest;
 import org.nuxeo.ecm.automation.client.Session;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
+import org.nuxeo.ecm.automation.client.model.Blob;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
@@ -54,6 +56,7 @@ import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
+import org.nuxeo.ecm.automation.client.model.StreamBlob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
 import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
@@ -498,18 +501,27 @@ public class NuxeoConnector extends BaseDocumentService {
      **/
 
     /**
-     * Creates a Blob from a File
+     * Creates a Blob from a File or a FileInputStream
      *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:file-to-blob}
      *
      * @param file the input File
      * @return the Blob wrapping the File
      */
-    @Transformer(sourceTypes = { File.class })
+    @Transformer(sourceTypes = { File.class, FileInputStream.class })
     @Summary("converts a File to a Blob")
-    public static FileBlob fileToBlob(File file) {
-        return new FileBlob(file);
+    public static Blob fileToBlob(Object file) {
+        if (file instanceof File) {
+            return new FileBlob((File)file);
+        } else if (file instanceof FileInputStream) {
+            FileInputStream stream = (FileInputStream) file;
+            return new StreamBlob(stream,"mule.blob", "application/octet-stream");
+        }
+        return null;
+
     }
+
+
 
     /**
      * Creates a Blob from a String
