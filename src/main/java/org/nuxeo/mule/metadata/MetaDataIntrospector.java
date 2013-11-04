@@ -1,6 +1,7 @@
 package org.nuxeo.mule.metadata;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.mule.common.metadata.DefaultMetaData;
@@ -13,8 +14,6 @@ import org.mule.common.metadata.builder.DynamicObjectBuilder;
 import org.mule.common.metadata.builder.DynamicObjectFieldBuilder;
 import org.mule.common.metadata.datatype.DataType;
 import org.nuxeo.ecm.automation.client.Session;
-
-import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * For testing purpose, this implementation is hard-coded and not wired to a REST API
@@ -44,7 +43,6 @@ public class MetaDataIntrospector {
             types.add(new DefaultMetaDataKey(DOC_PREFIX + docType, docType + " (doctype)", false));
             types.add(new DefaultMetaDataKey(DATAMODEL_PREFIX + docType, docType + " (datamodel)", false));
         }
-
         Collections.sort(types);
         return types;
     }

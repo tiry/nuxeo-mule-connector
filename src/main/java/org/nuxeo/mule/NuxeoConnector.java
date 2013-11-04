@@ -6,6 +6,7 @@ package org.nuxeo.mule;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,10 +55,10 @@ import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StreamBlob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
 import org.nuxeo.mule.blob.NuxeoBlob;
+import org.nuxeo.mule.blob.NuxeoFileBlob;
 import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
 import org.nuxeo.mule.poll.ListenerConfig;
-
 /**
  * Connector that uses Nuxeo Automation java client to leverage Nuxeo Rest API
  *
@@ -501,23 +502,39 @@ public class NuxeoConnector extends BaseDocumentService {
      *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:file-to-blob}
      *
-     * @param file the input File
+     * @param input the input File
      * @return the Blob wrapping the File
      */
     @Transformer(sourceTypes = { File.class, FileInputStream.class })
     @Summary("converts a File to a Blob")
-    public static NuxeoBlob fileToBlob(Object file) {
-        logger.info("Converting " + file.getClass().getCanonicalName() + " to Nuxeo Blob");
-        if (file instanceof File) {
+    public static NuxeoBlob fileToBlob(Object input) {
+        logger.info("Converting " + input.getClass().getCanonicalName() + " to Nuxeo Blob");
+        if (input instanceof File) {
             logger.info("Creating FileBlob");
-            return new NuxeoBlob(new FileBlob((File)file));
-        } else if (file instanceof FileInputStream) {
+            return new NuxeoFileBlob(new FileBlob((File)input));
+        } else if (input instanceof FileInputStream) {
             logger.info("Creating StreamBlob");
-            FileInputStream stream = (FileInputStream) file;
+            FileInputStream stream = (FileInputStream) input;
+
+            if (input.getClass().getSimpleName().contains("ReceiverFileInputStream")) {
+                // hack because this f**cking class is private !
+                try {
+                    Method hiddentGetter = input.getClass().getDeclaredMethod("getCurrentFile", null);
+                    hiddentGetter.setAccessible(true);
+                    File targetFile = (File) hiddentGetter.invoke(input);
+                    return new NuxeoFileBlob(new FileBlob(targetFile));
+                } catch (NoSuchMethodException e) {
+                    logger.error("Can not find getCurrentFile method", e);
+                } catch (SecurityException e) {
+                    logger.error("Can not access getCurrentFile method", e);
+                } catch (Exception e) {
+                    logger.error("Can not execute getCurrentFile method", e);
+                }
+            }
             return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
-        } else if (file instanceof byte[]) {
+        } else if (input instanceof byte[]) {
             logger.info("Creating ByteArray Blob");
-            ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) file);
+            ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) input);
             return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
         }
         return null;

@@ -176,6 +176,12 @@
       <artifactId>mule-module-spring-config</artifactId>
       <version>${mule.version}</version>
     </dependency>
+    <!-- classes are private in this artifact !!!
+    <dependency>
+      <groupId>org.mule.transports</groupId>
+      <artifactId>mule-transport-file</artifactId>
+      <version>${mule.version}</version>
+    </dependency>-->
     <dependency>
       <groupId>org.mule.tools.devkit</groupId>
       <artifactId>mule-devkit-annotations</artifactId>

@@ -7,6 +7,8 @@ import org.nuxeo.ecm.automation.client.model.Blob;
 
 public class NuxeoBlob extends Blob{
 
+    private static final long serialVersionUID = 1L;
+
     protected final Blob wrappedBlob;
 
     public NuxeoBlob(Blob wrapped) {
