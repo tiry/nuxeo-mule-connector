@@ -505,7 +505,7 @@ public class NuxeoConnector extends BaseDocumentService {
      * @param input the input File
      * @return the Blob wrapping the File
      */
-    @Transformer(sourceTypes = { File.class, FileInputStream.class })
+    @Transformer(sourceTypes = { File.class, FileInputStream.class, byte[].class })
     @Summary("converts a File to a Blob")
     public static NuxeoBlob fileToBlob(Object input) {
         logger.info("Converting " + input.getClass().getCanonicalName() + " to Nuxeo Blob");
