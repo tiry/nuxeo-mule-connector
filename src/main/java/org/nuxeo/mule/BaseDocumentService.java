@@ -362,6 +362,7 @@ public class BaseDocumentService {
         return docService.update(new DocRef(doc), new PropertyMap(properties));
     }
 
+
     /**
      * Updates a Document with DataSense
      *
@@ -373,12 +374,12 @@ public class BaseDocumentService {
      * @return a Document Object
      * @throws Exception if operation can not be executed
      */
-    @Processor
+    /*@Processor
     public Document updateds(@MetaDataKeyParam @Placement(group = "operation parameters") @FriendlyName("doc type") String type, @Placement(group = "operation parameters")
    String doc, @Placement(group = "operation parameters")
     Map<String, Object> properties) throws Exception {
         return docService.update(new DocRef(doc), new PropertyMap(properties));
-    }
+    }*/
 
     /**
      * Publish a Document

@@ -80,6 +80,23 @@ public class NuxeoConnector extends BaseDocumentService {
     private String serverName = "127.0.0.1";
 
     /**
+     * Protocol (http/https) to access Nuxeo Server
+     */
+    @Configurable
+    @Placement(group = "Connection")
+    @Optional
+    @Default("http")
+    private String protocol = "http";
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    /**
      * Port used to connect to Nuxeo Server
      */
     @Configurable
@@ -215,11 +232,13 @@ public class NuxeoConnector extends BaseDocumentService {
     }
 
     protected String getServerUrl() {
-
+        if (protocol==null) {
+            protocol = "http";
+        }
         if (contextPath == null || contextPath.isEmpty()) {
-            return "http://" + serverName + ":" + port + "/" + "automation";
+            return protocol + "://" + serverName + ":" + port + "/" + "automation";
         } else {
-            return "http://" + serverName + ":" + port + "/" + contextPath
+            return protocol + "://" + serverName + ":" + port + "/" + contextPath
                     + "/site/automation";
         }
     }
@@ -567,8 +586,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { Document.class })
     @Summary("converts a Nuxeo document to a Map")
     public static Map<String, Object> documentToMap(Document doc) {
-        Map<String, Object> map = new HashMap<String, Object>(
-                doc.getProperties().map());
+        Map<String, Object> map = new HashMap<String, Object>();
         map.put("type", doc.getType());
         map.put("facets", doc.getFacets().list());
         map.put("id", doc.getId());
@@ -578,6 +596,7 @@ public class NuxeoConnector extends BaseDocumentService {
         map.put("path", doc.getPath());
         map.put("repository", doc.getRepository());
         map.put("state", doc.getState());
+        map.put("properties", doc.getProperties().map());
         return map;
     }
 
