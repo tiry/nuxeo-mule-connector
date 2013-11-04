@@ -3,22 +3,30 @@
  */
 package org.nuxeo.mule;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleException;
+import org.mule.api.processor.MessageProcessor;
 import org.mule.construct.Flow;
 import org.mule.tck.AbstractMuleTestCase;
 import org.mule.tck.FunctionalTestCase;
 import org.nuxeo.ecm.automation.client.Session;
+import org.nuxeo.ecm.automation.client.adapters.DocumentService;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
+import org.nuxeo.ecm.automation.client.model.PathRef;
 import org.nuxeo.ecm.automation.test.EmbeddedAutomationServerFeature;
 import org.nuxeo.ecm.core.test.annotations.Granularity;
 import org.nuxeo.ecm.core.test.annotations.RepositoryConfig;
+import org.nuxeo.ecm.platform.audit.AuditFeature;
+import org.nuxeo.mule.poll.NuxeoSimpleEvent;
 import org.nuxeo.runtime.test.runner.Deploy;
 import org.nuxeo.runtime.test.runner.Features;
 import org.nuxeo.runtime.test.runner.FeaturesRunner;
@@ -29,7 +37,7 @@ import com.google.inject.Inject;
 @RunWith(FeaturesRunner.class)
 @Deploy({ "org.nuxeo.ecm.platform.url.api", "org.nuxeo.ecm.platform.url.core",
         "org.nuxeo.ecm.platform.types.api", "org.nuxeo.ecm.platform.types.core" })
-@Features(EmbeddedAutomationServerFeature.class)
+@Features({ EmbeddedAutomationServerFeature.class, AuditFeature.class })
 @Jetty(port = 18080)
 @RepositoryConfig(cleanup = Granularity.CLASS)
 public class NuxeoConnectorTest extends FunctionalTestCase {
@@ -107,6 +115,51 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
         Map<String, Object> map = (Map<String, Object>) ((Map<String, Object>) responseEvent.getMessage().getPayload()).get("properties");
         assertEquals("Mule Workspace", map.get("dc:title"));
         assertEquals("Some nice description", map.get("dc:description"));
+    }
+
+    /**
+     * Runs a flow with a Source bound to Nuxeo Event bus
+     *
+     * Simply checks that when creating a Doc using the Automation Client the
+     * corresponding event is forwarded to Mule source
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testFlowWithSource() throws Exception {
+
+        final List<String> createdDocIds = new ArrayList<String>();
+
+        Flow flow = lookupFlowConstruct("nuxeoTestSource");
+        flow.getMessageSource().setListener(new MessageProcessor() {
+            @Override
+            public MuleEvent process(MuleEvent event) throws MuleException {
+                NuxeoSimpleEvent nxEvent = (NuxeoSimpleEvent) event.getMessage().getPayload();
+                if (nxEvent.getEventId().equals("documentCreated")) {
+                    createdDocIds.add(nxEvent.getDocUUID());
+                }
+                // System.out.println(nxEvent.toString());
+                return event;
+            }
+        });
+
+        // let some time for the polling
+        Thread.sleep(7000);
+
+        // now create some activity on the nuxeo side !
+        Session session = client.getSession("Administrator", "Administrator");
+        DocumentService ds = session.getAdapter(DocumentService.class);
+        Document doc = ds.createDocument(new PathRef("/"), "File", "fromTest");
+        assertNotNull(doc);
+        session.close();
+
+        // let some time for the polling
+        Thread.sleep(7000);
+
+        // check that we have received the event !
+        assertTrue(createdDocIds.contains(doc.getId()));
+
+        flow.stop();
     }
 
     /**

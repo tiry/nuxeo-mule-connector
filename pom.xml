@@ -14,7 +14,7 @@
     <junit.version>4.9</junit.version>
     <mockito.version>1.9.5</mockito.version>
     <jdk.version>1.6</jdk.version>
-    <nuxeo.version>5.8-SNAPSHOT</nuxeo.version>
+    <nuxeo.version>5.8</nuxeo.version>
     <!--<java7.home>/usr/lib/jvm/jdk1.7.0_10/</java7.home>-->
   </properties>
 
@@ -268,6 +268,32 @@
       <scope>test</scope>
     </dependency>
 
+    <!--  for Audit in tests -->
+    <dependency>
+      <groupId>org.nuxeo.ecm.platform</groupId>
+      <artifactId>nuxeo-platform-audit-api</artifactId>
+      <scope>test</scope>
+      <version>${nuxeo.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.ecm.platform</groupId>
+      <artifactId>nuxeo-platform-audit-core</artifactId>
+      <scope>test</scope>
+      <version>${nuxeo.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.ecm.platform</groupId>
+      <artifactId>nuxeo-platform-audit-core</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+      <version>${nuxeo.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.nuxeo.runtime</groupId>
+      <artifactId>nuxeo-runtime-datasource</artifactId>
+      <scope>test</scope>
+      <version>${nuxeo.version}</version>
+    </dependency>
 
   </dependencies>
 

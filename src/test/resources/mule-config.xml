@@ -10,7 +10,7 @@
         http://www.mulesoft.org/schema/mule/nuxeo http://www.mulesoft.org/schema/mule/nuxeo/1.0-SNAPSHOT/mule-nuxeo.xsd
         http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
 
-  <nuxeo:config name="NuxeoServer" username="Administrator"
+  <nuxeo:config name="NuxeoServer" username="Administrator" protocol="http"
     password="Administrator" serverName="localhost" port="18080"
     contextPath="" defaultSchemas="common,dublincore,file" >
         <nuxeo:connection-pooling-profile initialisationPolicy="INITIALISE_ONE" exhaustedAction="WHEN_EXHAUSTED_GROW"/>
@@ -66,6 +66,11 @@
       doc:name="Query" />
     <set-payload value="#[payload.get(0)]" doc:name="get First Document" />
     <nuxeo:document-to-map doc:name="Nuxeo" />
+  </flow>
+
+  <flow name="nuxeoTestSource" doc:name="nuxeoTestSource">
+    <nuxeo:listen-to-events config-ref="NuxeoServer" doc:name="Nuxeo (Streaming)"/>
+    <logger level="INFO" doc:name="Logger"/>
   </flow>
 
 </mule>
