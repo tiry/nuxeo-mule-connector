@@ -3,6 +3,7 @@
  */
 package org.nuxeo.mule;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.mule.api.ConnectionException;
 import org.mule.api.MuleException;
 import org.mule.api.annotations.Category;
@@ -36,13 +38,8 @@ import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
 import org.mule.api.callback.StopSourceCallback;
-import org.mule.common.metadata.DefaultMetaData;
-import org.mule.common.metadata.DefaultMetaDataKey;
 import org.mule.common.metadata.MetaData;
 import org.mule.common.metadata.MetaDataKey;
-import org.mule.common.metadata.MetaDataModel;
-import org.mule.common.metadata.builder.DefaultMetaDataBuilder;
-import org.mule.common.metadata.builder.DynamicObjectBuilder;
 import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
@@ -69,6 +66,8 @@ import org.nuxeo.mule.poll.ListenerConfig;
  */
 @Connector(name = "nuxeo", schemaVersion = "1.0-SNAPSHOT")
 public class NuxeoConnector extends BaseDocumentService {
+
+    private static final Logger logger = Logger.getLogger(NuxeoConnector.class);
 
     /**
      * Nuxeo Server name (IP or DNS name)
@@ -508,14 +507,20 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { File.class, FileInputStream.class })
     @Summary("converts a File to a Blob")
     public static NuxeoBlob fileToBlob(Object file) {
+        logger.info("Converting " + file.getClass().getCanonicalName() + " to Nuxeo Blob");
         if (file instanceof File) {
+            logger.info("Creating FileBlob");
             return new NuxeoBlob(new FileBlob((File)file));
         } else if (file instanceof FileInputStream) {
+            logger.info("Creating StreamBlob");
             FileInputStream stream = (FileInputStream) file;
+            return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
+        } else if (file instanceof byte[]) {
+            logger.info("Creating ByteArray Blob");
+            ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) file);
             return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
         }
         return null;
-
     }
 
     /**
@@ -580,7 +585,7 @@ public class NuxeoConnector extends BaseDocumentService {
 
     @Start
     public void init() throws MuleException {
-        System.out.println("START!!");
+        logger.info("Starting Nuxeo Connector");
         if (isConnected() && pendingListeners.size()>0) {
             for (ListenerConfig config : pendingListeners) {
                 getPollingClient().subscribe(config);
@@ -643,25 +648,19 @@ public class NuxeoConnector extends BaseDocumentService {
 
     @MetaDataKeyRetriever
     public List<MetaDataKey> getMetaDataKeys() throws Exception {
-        List<MetaDataKey> keys = new ArrayList<MetaDataKey>();
-        String[] nuxeoDocTypes = getIntrospector().getDocTypes();
-        for (String type : nuxeoDocTypes) {
-            keys.add(new DefaultMetaDataKey(type, type, false));
+        List<MetaDataKey> types =  getIntrospector().getMuleTypes();
+        for (MetaDataKey key : types) {
+            logger.info("registering type " + key.getId() + " with display name " + key.getDisplayName());
+            System.out.println("registering type " + key.getId() + " with display name " + key.getDisplayName());
         }
-        return keys;
+        return types;
     }
 
     @MetaDataRetriever
     public MetaData getMetaData(MetaDataKey key) throws Exception {
-        String targetDocType = key.getId();
-        DynamicObjectBuilder dynamicObject = new DefaultMetaDataBuilder().createDynamicObject(key.getId());
-        for (String schema : getIntrospector().getSchemasForDocType(targetDocType)) {
-            getIntrospector().mapSchema(dynamicObject, schema);
-        }
-
-        MetaDataModel model = dynamicObject.build();
-        return new DefaultMetaData(model);
+        System.out.println("retrieve metadata for " + key.getId());
+        logger.info("retrieve metadata for " + key.getId());
+        return getIntrospector().getMuleTypeMetaData(key.getId());
     }
-
 
 }
