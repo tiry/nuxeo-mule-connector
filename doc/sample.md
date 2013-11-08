@@ -163,6 +163,8 @@ Set the variable "filename" to #[message.inboundProperties['originalFilename']].
   
 1. **Test the flow: right click on the file "Demo.mflow" > Run As > Mule Application, then drop  files under the import folder you chose, and check documents are created with the files on the Nuxeo sever.**
 
+You can also copy past the [XML flow](demo.mflow) and change a few config elements (mainly fs paths).
+
 Note: You could also have used the operation "FileManager.Import" so as to create the document and upload the file in one step. In the flow we chose to detail, you controle everything: type of the created document, title, name of the file, … Using FileManager.Import will provide a much shorter flow, though with less control on what is done, but may suit simple file upload use case!
 
 
