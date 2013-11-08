@@ -80,7 +80,7 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
    
    1. Fill username Administrator, password Administrator, Server Name : http://demo.nuxeo.com Port:80 (or localhost:8080). 
 
-   ![Nuxeo Demo Connection](images/Mule%20ESB/Nuxeo%20Connection.png)
+   ![Nuxeo Demo Connection](images/Nuxeo%20Connection.png)
 
    
    1. Save and go back to your flows view.
@@ -100,10 +100,10 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
    
    1. **Move to directory**: select a path where the files will be moved after having been imported to Nuxeo
 
-   ![](images/Mule%20ESB/File%20polling%20properties.png)
+   ![](images/File%20polling%20properties.png)
    
    1. Let other properties unchanged, and click back to the flow editor and save it.
-   ![](images/Mule%20ESB/File_upload_flow_step1.png)
+   ![](images/File_upload_flow_step1.png)
 
 1. Drop a "File to Byte Array" transformer. This is necessary as we will need to store the file as a variable so as to create the File document first on Nuxeo server, then upload the binary on that document.
 
@@ -111,7 +111,7 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
    1. **Display Name**: Byte Array File to Blob
    1. **Operation**: File to Blob
 
- ![](images/Mule%20ESB/File_upload_flow_step3.png)
+ ![](images/File_upload_flow_step3.png)
 
 
 1. Drop a "Set Variable" component. Goal is to set the Nuxeo blob as a variable in the flow, so as to re-use it later, once the File document that will hold it has been created. Fill the following properties on the component:
@@ -132,7 +132,7 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
        1. Fill the metadata that should be part of the docuemnt once created:
           1. Name: dc:title  Value: #[filename]
           1. Name: dc:description: Value : a decription of the file
-            ![](images/Mule%20ESB/File%20properties.png)
+            ![](images/File%20properties.png)
 
     1. Go back to the flow editor and save
 
