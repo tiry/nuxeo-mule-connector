@@ -94,11 +94,11 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
 1. Select it, this opens the property editor for this element on the bottom part of the screen. Rename it "File_upload". Let other option as is.
 
 1. Select the File Endpoint inside File_upload flow and edit its properties on the bottom part:
-   1. **Display name**: File polling
+   - **Display name**: File polling
    
-   1. **Path**: select a path where you will drop the files for your tests
+   - **Path**: select a path where you will drop the files for your tests
    
-   1. **Move to directory**: select a path where the files will be moved after having been imported to Nuxeo
+   - **Move to directory**: select a path where the files will be moved after having been imported to Nuxeo
 
    ![](images/File%20polling%20properties.png)
    
@@ -108,41 +108,62 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
 1. Drop a "File to Byte Array" transformer. This is necessary as we will need to store the file as a variable so as to create the File document first on Nuxeo server, then upload the binary on that document.
 
 1. Drop a "Nuxeo" transformer so as to transform the Byte Array File in a Nuxeo Blob (required by the Nuxeo Connector). Set the following properties then go back to the flow editor and save:
-   1. **Display Name**: Byte Array File to Blob
-   1. **Operation**: File to Blob
+   - **Display Name**: Byte Array File to Blob
+   - **Operation**: File to Blob
 
  ![](images/File_upload_flow_step3.png)
 
 
 1. Drop a "Set Variable" component. Goal is to set the Nuxeo blob as a variable in the flow, so as to re-use it later, once the File document that will hold it has been created. Fill the following properties on the component:
-   1. **Display Name**: Set as FileToUpload
-   1. **Operation**: Set Variable
-   1. **Name**: FileToUpload
-   1. **Value**: #[payload]
+   - **Display Name**: Set as FileToUpload
+   - **Operation**: Set Variable
+   - **Name**: FileToUpload
+   - **Value**: #[payload]
    
 1. Drop a Nuxeo Connector at the end of the flow so as to create the File document on the Nuxeo server. E	dit the following properties:
-   1. **Display Name**: Create document
-   1. **Config reference**: Choose the Nuxeo config of your choice (the one you created at the begining of this tutorial)
-   1. **Operation**: Choose Create Document
-   1. **Parent document reference**:/default-domain/workspaces
-   1. **Document Type**: File
-   #. **name of the document**:Quel est la règle
-   1. **properties**: choose "Create Object Manually" then
+   - **Display Name**: Create document
+   - **Config reference**: Choose the Nuxeo config of your choice (the one you created at the begining of this tutorial)
+   - **Operation**: Choose Create Document
+   - **Parent document reference**:/default-domain/workspaces
+   - **Document Type**: File
+   - **name of the document**:#[filename]
+   - **properties**: choose "Create Object Manually" then
        1. Select the k:v Map <String,Object> row and click on the "+" icon.
        1. Fill the metadata that should be part of the docuemnt once created:
-          1. Name: dc:title  Value: #[filename]
-          1. Name: dc:description: Value : a decription of the file
+          - Name: dc:title  Value: #[filename]
+          - Name: dc:description: Value : a decription of the file
             ![](images/File%20properties.png)
 
     1. Go back to the flow editor and save
-
+    
+1. Drop a Set Variable component. Goal is to save the document id that was just created. Use the following property values:
+   - **Display Name**: Save Document id
+   - **Operation**: Set variable
+   - **Name**: FileDocumentId
+   - **Value**: #[payload.id]
+  
 1.  Drop between the File polling component and File to Byte array a set variable component. 
 Set the variable "filename" to #[message.inboundProperties['originalFilename']]. Goal is store the filename across the flow. 
 
-    ![SetFilename](images/Set%20filename.png)
-
+    ![SetFilename](images/SetFileName.png)
+    
+1. Drop a "Set Payload" component ath the end, so as to get the file back in the payload for uploading it to the newly created document. Configure the following properties:
+   - **Display Name**:Set the file as Payload 
+   - **Value**:#[FileToUpload]
+   ![](images/SetFileInThePayload.png)
    
-To be continued
+1. Drop a new Nuxeo Connector with the following properties
+   - **Display Name**:Upload the file
+   - **Config Reference**: Choose the Nuxeo server you choose for creating the File Document
+   - **Operation**: Set Blob
+   - **Doc**: #[FileDocumentId]
+   - **Blob** Reference: #[payload]
+   - **XPath**: file:content
+  ![](images/UploadFile.png)
+  
+1. **Test the flow: right click on the file "Demo.mflow" > Run As > Mule Application, then drop  files under the import folder you chose, and check documents are created with the files on the Nuxeo sever.**
+
+Note: You could also have used the operation "FileManager.Import" so as to create the document and upload the file in one step. In the flow we chose to detail, you controle everything: type of the created document, title, name of the file, … Using FileManager.Import will provide a much shorter flow, though with less control on what is done, but may suit simple file upload use case!
 
 
 ### Other Resources
