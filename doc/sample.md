@@ -71,6 +71,7 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
 
 1.    Click next once again then click **finnish** to end up the wizzard. You should now be in front of an empty flow editor.
 ![Empty flow editor](images/Empty%20Flow%20Editor.png)
+
 1. Global configuration of a Nuxeo Server
 
    We need to declare globally the Nuxeo connections that we will use. For this tutorial, we need to create a connection to Nuxeo demo server: http://demo.nuxeo.com (Administrator/Administrator)
@@ -78,7 +79,9 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
    1. Click on Global Elements tab, then Create, Filter using "Nuxeo" and choose the Cloud Connector
    
    1. Fill username Administrator, password Administrator, Server Name : http://demo.nuxeo.com Port:80 (or localhost:8080). 
+
    ![Nuxeo Demo Connection](images/Mule%20ESB/Nuxeo%20Connection.png)
+
    
    1. Save and go back to your flows view.
 
@@ -96,17 +99,20 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
    1. **Path**: select a path where you will drop the files for your tests
    
    1. **Move to directory**: select a path where the files will be moved after having been imported to Nuxeo
+
    ![](images/Mule%20ESB/File%20polling%20properties.png)
    
    1. Let other properties unchanged, and click back to the flow editor and save it.
    ![](images/Mule%20ESB/File_upload_flow_step1.png)
-   
+
 1. Drop a "File to Byte Array" transformer. This is necessary as we will need to store the file as a variable so as to create the File document first on Nuxeo server, then upload the binary on that document.
 
 1. Drop a "Nuxeo" transformer so as to transform the Byte Array File in a Nuxeo Blob (required by the Nuxeo Connector). Set the following properties then go back to the flow editor and save:
    1. **Display Name**: Byte Array File to Blob
    1. **Operation**: File to Blob
+
  ![](images/Mule%20ESB/File_upload_flow_step3.png)
+
 
 1. Drop a "Set Variable" component. Goal is to set the Nuxeo blob as a variable in the flow, so as to re-use it later, once the File document that will hold it has been created. Fill the following properties on the component:
    1. **Display Name**: Set as FileToUpload
@@ -126,13 +132,15 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
        1. Fill the metadata that should be part of the docuemnt once created:
           1. Name: dc:title  Value: #[filename]
           1. Name: dc:description: Value : a decription of the file
-            ![](https://github.com/aescaffre/nuxeo-mule-connector/blob/master/doc/images/Mule ESB/File properties.png)
+            ![](images/Mule%20ESB/File%20properties.png)
+
     1. Go back to the flow editor and save
 
 1.  Drop between the File polling component and File to Byte array a set variable component. 
 Set the variable "filename" to #[message.inboundProperties['originalFilename']]. Goal is store the filename across the flow. 
 
-    ![SetFilename](https://github.com/aescaffre/nuxeo-mule-connector/blob/master/doc/images/Set filename.png)
+    ![SetFilename](images/Set%20filename.png)
+
    
 To be continued
 
