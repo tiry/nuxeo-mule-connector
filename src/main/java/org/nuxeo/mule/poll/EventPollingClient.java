@@ -57,6 +57,10 @@ public class EventPollingClient {
             }
 
             protected void processEvent(JsonNode event) throws Exception {
+                if (event==null) {
+                    logger.info("skip null event");
+                    return;
+                }
                 Map<String, Object> props = new HashMap<String, Object>();
                 Iterator<String> fieldNames = event.getFieldNames();
                 while(fieldNames.hasNext()) {
