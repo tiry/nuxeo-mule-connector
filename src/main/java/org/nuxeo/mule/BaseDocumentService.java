@@ -17,6 +17,7 @@ import org.nuxeo.ecm.automation.client.model.Blob;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
+import org.nuxeo.ecm.automation.client.model.OperationInput;
 import org.nuxeo.ecm.automation.client.model.PropertyMap;
 import org.nuxeo.mule.blob.NuxeoBlob;
 
@@ -561,6 +562,165 @@ public class BaseDocumentService {
         } else {
             docService.fireEvent(new DocRef(doc), event);
         }
+    }
+
+    protected OperationInput getInput(Object blobOrDoc) {
+        OperationInput in = null;
+        if (blobOrDoc instanceof String) {
+            in =  DocRef.newRef((String) blobOrDoc);
+        } else if (blobOrDoc instanceof Document) {
+            in =  DocRef.newRef(((Document) blobOrDoc).getId());
+        } else if (blobOrDoc instanceof Blob) {
+            in = (Blob) blobOrDoc;
+        }
+        return in;
+    }
+
+    /**
+     * convert the input Blob  as PDF
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:blob-to-pdf}
+     *
+     * @param blobOrDoc blob or Document to convert
+     * @return the PDF conversion
+     *
+     * @throws Exception if operation can not be executed
+     */
+    @Processor
+    public NuxeoBlob blobToPdf(@Placement(group = "operation parameters")
+    Object blobOrDoc) throws Exception {
+        OperationRequest req = session.newRequest("Blob.ToPDF").setInput(getInput(blobOrDoc));
+        return new NuxeoBlob((Blob) req.execute());
+    }
+
+
+    /**
+     * resize the input Blob Picture
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:resize-picture}
+     *
+     * @param blobOrDoc blob or document that contains the picture
+     * @param maxWidth target maximum Width in pixels
+     * @param maxHeight target maximum Height in pixels
+     *
+     * @return the resized Picture
+     *
+     * @throws Exception if operation can not be executed
+     */
+    @Processor
+    public NuxeoBlob resizePicture(@Placement(group = "operation parameters")
+    Object blobOrDoc,
+    @Placement(group = "operation parameters") @Optional Integer maxWidth,
+    @Placement(group = "operation parameters") @Optional Integer maxHeight) throws Exception {
+        OperationRequest req = session.newRequest("Picture.resize").setInput(getInput(blobOrDoc));
+        if (maxWidth != null) {
+            req.set("maxWidth", maxWidth);
+        }
+        if (maxHeight != null) {
+            req.set("maxHeight", maxHeight);
+        }
+        return new NuxeoBlob((Blob) req.execute());
+    }
+
+    /**
+     * create a Document from a file
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:import-file}
+     *
+     * @param blobOrDoc blob or document that contains the picture
+     * @param overwrite define if existing  document should be overriden
+     *
+     * @return the created Document
+     *
+     * @throws Exception if operation can not be executed
+     */
+    @Processor
+    public Document importFile(@Placement(group = "operation parameters")
+    NuxeoBlob blobOrDoc,
+    @Placement(group = "operation parameters") @Optional @Default("false") boolean overwrite) throws Exception {
+
+        OperationRequest req = session.newRequest("FileManager.Import").setInput(getInput(blobOrDoc));
+        req.set("overwrite", overwrite);
+        return (Document) req.execute();
+    }
+
+
+    /**
+     *
+     * Starts the workflow with the given model id on the input documents
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:start-workflow}
+     *
+     * @param docRef target Document the Workflow should be started on
+     * @param workflowId uuid of the workflow to be started
+     * @param start start flag
+     * @param wfVars workflow variables
+     *
+     * @return the doc
+     *
+     * @throws Exception  if operation can not be executed
+     */
+    @Processor
+    public Document startWorkflow(
+        @Placement(group = "operation parameters") String docRef,
+        @Placement(group = "operation parameters") String workflowId,
+        @Placement(group = "operation parameters") @Optional @Default("false")  boolean start,
+        @Placement(group = "operation parameters") @Optional Map<String, Object> wfVars) throws Exception
+        {
+
+        OperationRequest req = session.newRequest("Context.StartWorkflow").setInput(DocRef.newRef(docRef));
+        req.set("Id", workflowId);
+        req.set("start", start);
+        req.set("variables", new PropertyMap(wfVars));
+        return (Document) req.execute();
+    }
+
+    /**
+     * Cancel the workflow with the given id,
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:cancel-workflow}
+     *
+     * @param workflowId the id of the Document that represents the target Workflow
+     *
+     * @return the input Doc
+     *
+     * @throws Exception  if operation can not be executed
+     */
+    @Processor
+    public Document cancelWorkflow(
+    @Placement(group = "operation parameters") String workflowId) throws Exception {
+        OperationRequest req = session.newRequest("Context.CancelWorkflow");
+        req.set("Id", workflowId);
+        return (Document) req.execute();
+    }
+
+
+    /**
+     * Completes the input task document.
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:complete-task}
+     *
+     * @param docRef target Task document
+     * @param comment optional comment
+     * @param status optional status
+     *
+     * @return the task document
+     *
+     * @throws Exception  if operation can not be executed
+     */
+    @Processor
+    public Document completeTask(
+    @Placement(group = "operation parameters") String docRef,
+    @Placement(group = "operation parameters") @Optional String comment,
+    @Placement(group = "operation parameters") @Optional String status) throws Exception {
+        OperationRequest req = session.newRequest("Workflow.CompleteTaskOperation").setInput(DocRef.newRef(docRef));
+        if(comment!=null) {
+            req.set("comment", comment);
+        }
+        if(status!=null) {
+            req.set("status", status);
+        }
+        return (Document) req.execute();
     }
 
 }

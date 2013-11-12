@@ -149,3 +149,34 @@
 <nuxeo:listen-to-events config-ref="Nuxeo"></nuxeo:listen-to-events>
 <!-- END_INCLUDE(nuxeo:listen-to-events) -->
 
+<!-- BEGIN_INCLUDE(nuxeo:blob-to-pdf) -->
+<nuxeo:blob-to-pdf config-ref="Nuxeo" blobOrDoc-ref="BlobObject" />
+<!-- END_INCLUDE(nuxeo:blob-to-pdf) -->
+
+<!-- BEGIN_INCLUDE(nuxeo:resize-picture) -->
+<nuxeo:resize-picture config-ref="Nuxeo" blobOrDoc-ref="#blob" />
+<!-- END_INCLUDE(nuxeo:resize-picture) -->
+
+<!-- BEGIN_INCLUDE(nuxeo:import-file) -->
+<nuxeo:import-file config-ref="Nuxeo" blobOrDoc-ref="#blob" />
+<!-- END_INCLUDE(nuxeo:import-file) -->
+
+<!-- BEGIN_INCLUDE(nuxeo:start-workflow) -->
+<nuxeo:start-workflow config-ref="Nuxeo"   docRef="#docRef" workflowId="wf1">
+    <nuxeo:wf-vars>
+        <nuxeo:wf-var key="A">1</nuxeo:wf-var>
+        <nuxeo:wf-var key="B">3</nuxeo:wf-var>
+    </nuxeo:wf-vars>
+</nuxeo:start-workflow>
+<!-- END_INCLUDE(nuxeo:start-workflow) -->
+
+<!-- BEGIN_INCLUDE(nuxeo:cancel-workflow) -->
+<nuxeo:cancel-workflow config-ref="Nuxeo"    workflowId="wf1">
+</nuxeo:cancel-workflow>
+<!-- END_INCLUDE(nuxeo:cancel-workflow) -->
+
+<!-- BEGIN_INCLUDE(nuxeo:complete-task) -->
+<nuxeo:complete-task config-ref="Nuxeo"   docRef="docRef">
+</nuxeo:complete-task>
+<!-- END_INCLUDE(nuxeo:complete-task) -->
+

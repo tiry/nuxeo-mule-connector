@@ -103,11 +103,11 @@ The connector uses the lastest Mule API, 3.5, since we use @Source.
 
 Quick build
 
-> mvn -Ddevkit.studio.package.skip=false -Ddevkit.javadoc.check.skip -DskipTests=true -Dmaven.test.skip=true clean package [-Djava7.home=/path/to/java7]
+> mvn -Ddevkit.studio.package.skip=false -Ddevkit.javadoc.check.skip -DskipTests=true -Dmaven.test.skip=true clean package 
 
 Build with tests
 
-> mvn -Ddevkit.studio.package.skip=false clean package [-Djava7.home=/path/to/java7]
+> mvn -Ddevkit.studio.package.skip=false clean package
 
 Then use the update site generated in target/update-site to load the plugin from MuleStudio
 
