@@ -112,7 +112,7 @@ public class NuxeoConnectorTest extends FunctionalTestCase {
         Flow flow = lookupFlowConstruct("nuxeoTestFlowWithConverter");
         MuleEvent event = AbstractMuleTestCase.getTestEvent(null);
         MuleEvent responseEvent = flow.process(event);
-        Map<String, Object> map = (Map<String, Object>) ((Map<String, Object>) responseEvent.getMessage().getPayload()).get("properties");
+        Map<String, Object> map = (Map<String, Object>) responseEvent.getMessage().getPayload();
         assertEquals("Mule Workspace", map.get("dc:title"));
         assertEquals("Some nice description", map.get("dc:description"));
     }

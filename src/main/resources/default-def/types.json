@@ -1,0 +1,723 @@
+{
+  "doctypes" : {
+    "SectionRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "MasterPublishSpace", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "Workspace" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "Folderish" ],
+      "schemas" : [ "file", "webcontainer", "publishing", "files", "common", "dublincore" ]
+    },
+    "RelationSearch" : {
+      "parent" : "Document",
+      "facets" : [ ],
+      "schemas" : [ "relation_search" ]
+    },
+    "user_open_tasks_cv" : {
+      "parent" : "Document",
+      "facets" : [ "ContentViewDisplay" ],
+      "schemas" : [ "user_open_tasks_cv", "content_view_display" ]
+    },
+    "PublicationRelation" : {
+      "parent" : "Relation",
+      "facets" : [ "HiddenInNavigation" ],
+      "schemas" : [ "relation", "dublincore" ]
+    },
+    "ManagementRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "dublincore", "common" ]
+    },
+    "NXDistribution" : {
+      "parent" : "Folder",
+      "facets" : [ "Commentable", "Versionable", "Folderish" ],
+      "schemas" : [ "common", "dublincore", "file", "nxdistribution" ]
+    },
+    "AdministrativeStatusContainer" : {
+      "parent" : "Folder",
+      "facets" : [ "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "dublincore", "common" ]
+    },
+    "DocumentRoute" : {
+      "parent" : "StepFolder",
+      "facets" : [ "StepFolder", "DocumentRoute", "SystemDocument", "HiddenInNavigation", "Folderish", "Orderable" ],
+      "schemas" : [ "document_route_instance", "document_route_model", "step_folder", "common", "dublincore" ]
+    },
+    "NXOperation" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "Versionable" ],
+      "schemas" : [ "common", "dublincore", "file", "nxoperation" ]
+    },
+    "NXComponent" : {
+      "parent" : "Folder",
+      "facets" : [ "Commentable", "Versionable", "Folderish" ],
+      "schemas" : [ "common", "dublincore", "file", "nxcomponent" ]
+    },
+    "CommentRelation" : {
+      "parent" : "Relation",
+      "facets" : [ "HiddenInNavigation" ],
+      "schemas" : [ "relation", "dublincore" ]
+    },
+    "Thread" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable" ],
+      "schemas" : [ "common", "dublincore", "thread" ]
+    },
+    "search_results" : {
+      "parent" : "Document",
+      "facets" : [ "HiddenInNavigation" ],
+      "schemas" : [ "dublincore", "common" ]
+    },
+    "TemplateRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "DocumentRouteStep" : {
+      "parent" : "Document",
+      "facets" : [ "RouteStep", "Commentable", "CommentsInfoHolder", "SystemDocument" ],
+      "schemas" : [ "dublincore", "info_comments" ]
+    },
+    "Domain" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "WorkspaceRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "Comment" : {
+      "parent" : "Document",
+      "facets" : [ "HiddenInNavigation" ],
+      "schemas" : [ "comment", "common", "dublincore" ]
+    },
+    "ConditionalStepFolder" : {
+      "parent" : "StepFolder",
+      "facets" : [ "StepFolder", "ConditionalStepFolder", "SystemDocument", "HiddenInNavigation", "Folderish", "Orderable" ],
+      "schemas" : [ "step_folder", "common", "dublincore", "conditional_step_folder" ]
+    },
+    "SimpleTask" : {
+      "parent" : "DocumentRouteStep",
+      "facets" : [ "TaskStep", "RouteStep", "Commentable", "CommentsInfoHolder", "SystemDocument" ],
+      "schemas" : [ "dublincore", "info_comments", "task_step" ]
+    },
+    "DefaultRelation" : {
+      "parent" : "Relation",
+      "facets" : [ "HiddenInNavigation" ],
+      "schemas" : [ "relation", "dublincore" ]
+    },
+    "ConditionalTask" : {
+      "parent" : "SimpleTask",
+      "facets" : [ "TaskStep", "RouteStep", "Commentable", "CommentsInfoHolder", "SystemDocument" ],
+      "schemas" : [ "conditional_task_step", "dublincore", "info_comments", "task_step" ]
+    },
+    "NXBundle" : {
+      "parent" : "Folder",
+      "facets" : [ "Commentable", "Versionable", "Folderish" ],
+      "schemas" : [ "common", "dublincore", "file", "nxbundle" ]
+    },
+    "StepFolder" : {
+      "parent" : "OrderedFolder",
+      "facets" : [ "StepFolder", "SystemDocument", "HiddenInNavigation", "Folderish", "Orderable" ],
+      "schemas" : [ "step_folder", "common", "dublincore" ]
+    },
+    "NXDocumentation" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "Versionable" ],
+      "schemas" : [ "common", "dublincore", "file", "files", "nxdocumentation" ]
+    },
+    "Forum" : {
+      "parent" : "Folder",
+      "facets" : [ "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "TaskRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "Post" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "HiddenInNavigation" ],
+      "schemas" : [ "common", "post", "dublincore" ]
+    },
+    "DocumentRouteInstancesRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SystemDocument", "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "NXSeamComponent" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "Versionable" ],
+      "schemas" : [ "common", "dublincore", "file", "nxseam" ]
+    },
+    "FollowLifeCycleTransitionTask" : {
+      "parent" : "SimpleTask",
+      "facets" : [ "TaskStep", "RouteStep", "Commentable", "CommentsInfoHolder", "SystemDocument" ],
+      "schemas" : [ "dublincore", "info_comments", "task_step" ]
+    },
+    "PublishTask" : {
+      "parent" : "SimpleTask",
+      "facets" : [ "TaskStep", "RouteStep", "Commentable", "CommentsInfoHolder", "SystemDocument" ],
+      "schemas" : [ "dublincore", "info_comments", "task_step" ]
+    },
+    "AdministrativeStatus" : {
+      "parent" : "Document",
+      "facets" : [ "HiddenInNavigation" ],
+      "schemas" : [ "dublincore", "status" ]
+    },
+    "DocumentRouteModelsRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SystemDocument", "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "UserWorkspacesRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "Relation" : {
+      "facets" : [ ],
+      "schemas" : [ "relation", "dublincore" ]
+    },
+    "Document" : {
+      "facets" : [ ],
+      "schemas" : [ ]
+    },
+    "Folder" : {
+      "parent" : "Document",
+      "facets" : [ "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "RouteNode" : {
+      "parent" : "Document",
+      "facets" : [ "NotFulltextIndexable", "SystemDocument", "HiddenInNavigation" ],
+      "schemas" : [ "dublincore", "route_node" ]
+    },
+    "File" : {
+      "parent" : "Document",
+      "facets" : [ "Downloadable", "Commentable", "Versionable", "Publishable", "HasRelatedText" ],
+      "schemas" : [ "common", "file", "dublincore", "uid", "files", "relatedtext" ]
+    },
+    "AdvancedSearch" : {
+      "parent" : "Document",
+      "facets" : [ ],
+      "schemas" : [ "advanced_search" ]
+    },
+    "Note" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "Versionable", "Publishable", "HasRelatedText" ],
+      "schemas" : [ "common", "note", "uid", "files", "dublincore", "relatedtext" ]
+    },
+    "TaskDoc" : {
+      "parent" : "Document",
+      "facets" : [ "Task", "HiddenInNavigation" ],
+      "schemas" : [ "common", "dublincore", "task" ]
+    },
+    "NXService" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "Versionable" ],
+      "schemas" : [ "common", "dublincore", "file", "nxservice" ]
+    },
+    "NXBundleGroup" : {
+      "parent" : "Folder",
+      "facets" : [ "Commentable", "Versionable", "Folderish" ],
+      "schemas" : [ "common", "dublincore", "file", "nxbundlegroup" ]
+    },
+    "HiddenFolder" : {
+      "parent" : "Folder",
+      "facets" : [ "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "Section" : {
+      "parent" : "Folder",
+      "facets" : [ "SuperSpace", "PublishSpace", "Folderish" ],
+      "schemas" : [ "file", "common", "dublincore" ]
+    },
+    "NXContribution" : {
+      "parent" : "Document",
+      "facets" : [ "Commentable", "Versionable" ],
+      "schemas" : [ "common", "dublincore", "file", "nxcontribution" ]
+    },
+    "Root" : {
+      "parent" : "Folder",
+      "facets" : [ "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "NXExtensionPoint" : {
+      "parent" : "Folder",
+      "facets" : [ "Commentable", "Versionable", "Folderish" ],
+      "schemas" : [ "common", "dublincore", "file", "nxextensionpoint" ]
+    },
+    "UserProfile" : {
+      "parent" : "Document",
+      "facets" : [ "UserProfile", "HiddenInNavigation" ],
+      "schemas" : [ "common", "dublincore", "userprofile" ]
+    },
+    "OrderedFolder" : {
+      "parent" : "Folder",
+      "facets" : [ "Folderish", "Orderable" ],
+      "schemas" : [ "common", "dublincore" ]
+    },
+    "BasicAuditSearch" : {
+      "parent" : "Document",
+      "facets" : [ ],
+      "schemas" : [ "basicauditsearch", "dublincore", "common" ]
+    },
+    "CommentRoot" : {
+      "parent" : "Folder",
+      "facets" : [ "HiddenInNavigation", "Folderish" ],
+      "schemas" : [ "common", "dublincore" ]
+    }
+  },
+  "schemas" : {
+    "common" : {
+      "@prefix" : "",
+      "icon" : "string",
+      "icon-expanded" : "string",
+      "size" : "long"
+    },
+    "dublincore" : {
+      "@prefix" : "dc",
+      "creator" : "string",
+      "source" : "string",
+      "nature" : "string",
+      "contributors" : "string[]",
+      "created" : "date",
+      "description" : "string",
+      "rights" : "string",
+      "subjects" : "string[]",
+      "publisher" : "string",
+      "valid" : "date",
+      "format" : "string",
+      "issued" : "date",
+      "modified" : "date",
+      "language" : "string",
+      "coverage" : "string",
+      "expired" : "date",
+      "lastContributor" : "string",
+      "title" : "string"
+    },
+    "file" : {
+      "@prefix" : "",
+      "content" : "blob",
+      "filename" : "string"
+    },
+    "webcontainer" : {
+      "@prefix" : "webc",
+      "welcomeText" : "string",
+      "useCaptcha" : "boolean",
+      "welcomeMedia" : "blob",
+      "theme" : "string",
+      "isWebContainer" : "boolean",
+      "baseline" : "string",
+      "template" : "string",
+      "logo" : "blob",
+      "themePerspective" : "string",
+      "themePage" : "string",
+      "name" : "string",
+      "moderationType" : "string",
+      "url" : "string",
+      "email" : "string"
+    },
+    "publishing" : {
+      "@prefix" : "publish",
+      "sections" : "string[]"
+    },
+    "files" : {
+      "@prefix" : "",
+      "files" : {
+        "fields" : {
+          "file" : "blob",
+          "filename" : "string"
+        },
+        "type" : "complex[]"
+      }
+    },
+    "relation_search" : {
+      "@prefix" : "rel_srch",
+      "dc_title" : "string",
+      "ecm_path" : "string[]",
+      "currentLifeCycleState" : "string",
+      "ecm_fulltext" : "string"
+    },
+    "user_open_tasks_cv" : {
+      "@prefix" : "user_open_tasks_cv",
+      "task_name" : "string",
+      "task_dueDate_min" : "date",
+      "task_dueDate_max" : "date",
+      "task_processId" : "string"
+    },
+    "content_view_display" : {
+      "@prefix" : "cvd",
+      "sortInfos" : {
+        "fields" : {
+          "sortColumn" : "string",
+          "sortAscending" : "boolean"
+        },
+        "type" : "complex[]"
+      },
+      "contentViewName" : "string",
+      "pageSize" : "long",
+      "selectedLayoutColumns" : "string[]"
+    },
+    "relation" : {
+      "@prefix" : "relation",
+      "sourceUri" : "string",
+      "source" : "string",
+      "targetUri" : "string",
+      "target" : "string",
+      "predicate" : "string",
+      "targetString" : "string"
+    },
+    "nxdistribution" : {
+      "@prefix" : "nxdistribution",
+      "key" : "string",
+      "version" : "string",
+      "name" : "string"
+    },
+    "document_route_instance" : {
+      "@prefix" : "docri",
+      "parentRouteNodeId" : "string",
+      "initiator" : "string",
+      "parentRouteInstanceId" : "string",
+      "variablesFacet" : "string",
+      "participatingDocuments" : "string[]",
+      "availabilityFilter" : "string"
+    },
+    "document_route_model" : {
+      "@prefix" : "docrm"
+    },
+    "step_folder" : {
+      "@prefix" : "stepf",
+      "execution" : "string"
+    },
+    "nxoperation" : {
+      "@prefix" : "nxop",
+      "name" : "string",
+      "signature" : "string[]",
+      "params" : {
+        "fields" : {
+          "values" : "string[]",
+          "order" : "long",
+          "name" : "string",
+          "required" : "boolean",
+          "type" : "string",
+          "widget" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "category" : "string",
+      "contributingComponent" : "string",
+      "since" : "string",
+      "url" : "string",
+      "version" : "string",
+      "operationClass" : "string",
+      "label" : "string",
+      "requires" : "string",
+      "description" : "longString"
+    },
+    "nxcomponent" : {
+      "@prefix" : "nxcomponent",
+      "componentId" : "string",
+      "builtInDocumentation" : "longString",
+      "services" : "string[]",
+      "isXML" : "boolean",
+      "componentName" : "string",
+      "componentClass" : "string"
+    },
+    "thread" : {
+      "@prefix" : "",
+      "moderated" : "boolean",
+      "moderators" : "string[]"
+    },
+    "info_comments" : {
+      "@prefix" : "infocom",
+      "numberOfComments" : "long"
+    },
+    "comment" : {
+      "@prefix" : "comment",
+      "text" : "string",
+      "creationDate" : "date",
+      "author" : "string"
+    },
+    "conditional_step_folder" : {
+      "@prefix" : "condstepf",
+      "posOfChildStepToRunNext" : "string"
+    },
+    "task_step" : {
+      "@prefix" : "tkst",
+      "comments" : "string[]",
+      "directive" : "string",
+      "dueDate" : "date",
+      "automaticValidation" : "boolean",
+      "actors" : "string[]"
+    },
+    "conditional_task_step" : {
+      "@prefix" : "ctkst",
+      "operator" : "string",
+      "value" : "string",
+      "subject" : "string"
+    },
+    "nxbundle" : {
+      "@prefix" : "nxbundle",
+      "jarName" : "string",
+      "requirements" : "string[]",
+      "artifactGroupId" : "string",
+      "artifactId" : "string",
+      "bundleId" : "string",
+      "artifactVersion" : "string"
+    },
+    "nxdocumentation" : {
+      "@prefix" : "nxdoc",
+      "documentationId" : "string",
+      "type" : "string",
+      "targetType" : "string",
+      "renderingType" : "string",
+      "target" : "string",
+      "nuxeoApproved" : "boolean",
+      "applicableVersions" : "string[]"
+    },
+    "post" : {
+      "@prefix" : "",
+      "author" : "string",
+      "creationDate" : "date",
+      "title" : "string",
+      "text" : "string",
+      "filename" : "string",
+      "fileContent" : "blob"
+    },
+    "nxseam" : {
+      "@prefix" : "nxseam",
+      "scope" : "string",
+      "interfaces" : "string[]",
+      "className" : "string",
+      "precedence" : "string",
+      "componentName" : "string"
+    },
+    "status" : {
+      "@prefix" : "",
+      "serviceId" : "string",
+      "administrative_status" : "string",
+      "instanceId" : "string",
+      "userLogin" : "string",
+      "statusMessage" : "string"
+    },
+    "route_node" : {
+      "@prefix" : "rnode",
+      "lastActor" : "string",
+      "canceled" : "long",
+      "taskLayout" : "string",
+      "taskButtons" : {
+        "fields" : {
+          "name" : "string",
+          "label" : "string",
+          "filter" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "executeOnlyFirstTransition" : "boolean",
+      "stop" : "boolean",
+      "button" : "string",
+      "taskDocType" : "string",
+      "start" : "boolean",
+      "startDate" : "date",
+      "taskNotificationTemplate" : "string",
+      "transitions" : {
+        "fields" : {
+          "result" : "boolean",
+          "chain" : "string",
+          "condition" : "string",
+          "description" : "string",
+          "name" : "string",
+          "targetId" : "string",
+          "label" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "nodeId" : "string",
+      "hasMultipleTasks" : "boolean",
+      "outputChain" : "string",
+      "merge" : "string",
+      "subRouteVariables" : {
+        "fields" : {
+          "value" : "string",
+          "key" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "taskAssignees" : "string[]",
+      "taskAssigneesExpr" : "string",
+      "taskY" : "string",
+      "count" : "long",
+      "taskX" : "string",
+      "taskAssigneesPermission" : "string",
+      "subRouteInstanceId" : "string",
+      "taskDueDateExpr" : "string",
+      "variablesFacet" : "string",
+      "tasksInfo" : {
+        "fields" : {
+          "status" : "string",
+          "ended" : "boolean",
+          "actor" : "string",
+          "comment" : "string",
+          "taskDocId" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "endDate" : "date",
+      "allowTaskReassignment" : "boolean",
+      "taskDueDate" : "date",
+      "inputChain" : "string",
+      "taskDescription" : "string",
+      "hasTask" : "boolean",
+      "taskDirective" : "string",
+      "subRouteModelExpr" : "string",
+      "escalationRules" : {
+        "fields" : {
+          "executed" : "boolean",
+          "multipleExecution" : "boolean",
+          "chain" : "string",
+          "condition" : "string",
+          "name" : "string",
+          "label" : "string"
+        },
+        "type" : "complex[]"
+      }
+    },
+    "uid" : {
+      "@prefix" : "",
+      "uid" : "string",
+      "minor_version" : "long",
+      "major_version" : "long"
+    },
+    "relatedtext" : {
+      "@prefix" : "",
+      "relatedtextresources" : {
+        "fields" : {
+          "relatedtextid" : "string",
+          "relatedtext" : "string"
+        },
+        "type" : "complex[]"
+      }
+    },
+    "advanced_search" : {
+      "@prefix" : "search",
+      "title" : "string",
+      "valid_max" : "date",
+      "expired_min" : "date",
+      "nature" : "string[]",
+      "fulltext_none" : "string",
+      "format" : "string",
+      "isCheckedInVersion" : "boolean",
+      "valid_min" : "date",
+      "issued_max" : "date",
+      "expired_max" : "date",
+      "created_min" : "date",
+      "created_max" : "date",
+      "fulltext_phrase" : "string",
+      "currentLifeCycleStates" : "string[]",
+      "modified_max" : "date",
+      "fulltext_all" : "string",
+      "sortColumn" : "string",
+      "description" : "string",
+      "currentLifeCycleState" : "string",
+      "searchpath" : "string[]",
+      "source" : "string",
+      "sortAscending" : "boolean",
+      "rights" : "string",
+      "language" : "string",
+      "issued_min" : "date",
+      "subjects" : "string[]",
+      "modified_min" : "date",
+      "fulltext_one_of" : "string",
+      "coverage" : "string[]"
+    },
+    "note" : {
+      "@prefix" : "",
+      "mime_type" : "string",
+      "note" : "string"
+    },
+    "task" : {
+      "@prefix" : "nt",
+      "targetDocumentId" : "string",
+      "initiator" : "string",
+      "directive" : "string",
+      "targetDocumentsIds" : "string[]",
+      "processId" : "string",
+      "delegatedActors" : "string[]",
+      "name" : "string",
+      "dueDate" : "date",
+      "task_variables" : {
+        "fields" : {
+          "value" : "string",
+          "key" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "type" : "string",
+      "taskComments" : {
+        "fields" : {
+          "creationDate" : "date",
+          "author" : "string",
+          "text" : "string"
+        },
+        "type" : "complex[]"
+      },
+      "accepted" : "boolean",
+      "actors" : "string[]"
+    },
+    "nxservice" : {
+      "@prefix" : "nxservice",
+      "componentId" : "string",
+      "className" : "string"
+    },
+    "nxbundlegroup" : {
+      "@prefix" : "nxbundlegroup",
+      "key" : "string",
+      "groupName" : "string"
+    },
+    "nxcontribution" : {
+      "@prefix" : "nxcontribution",
+      "documentation" : "longString",
+      "extensionPoint" : "string",
+      "targetComponentName" : "string",
+      "contribId" : "string"
+    },
+    "nxextensionpoint" : {
+      "@prefix" : "nxextensionpoint",
+      "extensionPoint" : "string[]",
+      "epId" : "string",
+      "documentation" : "longString",
+      "name" : "string"
+    },
+    "userprofile" : {
+      "@prefix" : "userprofile",
+      "avatar" : "blob",
+      "phonenumber" : "string",
+      "birthdate" : "date",
+      "gender" : "boolean",
+      "locale" : "string"
+    },
+    "basicauditsearch" : {
+      "@prefix" : "bas",
+      "targetDocumentType" : "string",
+      "endDate" : "date",
+      "targetRepository" : "string",
+      "eventIds" : "string[]",
+      "logId" : "long",
+      "eventCategories" : "string[]",
+      "eventId" : "string",
+      "targetDocumentPath" : "string",
+      "principalNames" : "string[]",
+      "startDate" : "date",
+      "principalName" : "string",
+      "eventCategory" : "string",
+      "targetDocumentUUID" : "string"
+    }
+  }
+}

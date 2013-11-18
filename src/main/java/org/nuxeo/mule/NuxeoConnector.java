@@ -6,7 +6,11 @@ package org.nuxeo.mule;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -259,7 +263,7 @@ public class NuxeoConnector extends BaseDocumentService {
         session.setDefaultSchemas(defaultSchemas);
         docService = session.getAdapter(DocumentService.class);
 
-        System.out.println("START!!");
+        logger.info("Connect Nuxeo Connector");
     }
 
     /**
@@ -326,7 +330,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Optional
     @FriendlyName("Sort columns")
     List<String> sortInfo) throws Exception {
-        System.out.println("Execute simple query on " + query);
+        logger.info("Execute simple query on " + query);
         return (Documents) execPageProvider(null, query, page, pageSize,
                 queryParams, sortInfo, false);
     }
@@ -508,13 +512,12 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /****************************** Transformers **************/
 
-    /**
-     * @Mime(MimeTypes.JSON)
-     * @Transformer(sourceTypes = { Document.class }) public static String
-     *                          documentToJSON(Document doc) {
-     *
-     *                          return null; }
-     **/
+    protected static File buildFileFromStream(InputStream stream) throws IOException {
+        File tmp = File.createTempFile("nuxeo", ".mule");
+        Files.copy(stream, tmp.toPath());
+        tmp.deleteOnExit();
+        return tmp;
+    }
 
     /**
      * Creates a Blob from a File or a FileInputStream
@@ -527,21 +530,26 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { File.class, FileInputStream.class, byte[].class })
     @Summary("converts a File to a Blob")
     public static NuxeoBlob fileToBlob(Object input) {
-        logger.info("Converting " + input.getClass().getCanonicalName() + " to Nuxeo Blob");
+        logger.info("Converting " + input.getClass().getName() + " to Nuxeo Blob");
         if (input instanceof File) {
             logger.info("Creating FileBlob");
             return new NuxeoFileBlob(new FileBlob((File)input));
         } else if (input instanceof FileInputStream) {
             logger.info("Creating StreamBlob");
             FileInputStream stream = (FileInputStream) input;
-
             if (input.getClass().getSimpleName().contains("ReceiverFileInputStream")) {
                 // hack because this f**cking class is private !
                 try {
                     Method hiddentGetter = input.getClass().getDeclaredMethod("getCurrentFile", null);
                     hiddentGetter.setAccessible(true);
                     File targetFile = (File) hiddentGetter.invoke(input);
-                    return new NuxeoFileBlob(new FileBlob(targetFile));
+                    if (targetFile==null) {
+                        logger.info("target File is null");
+                        return new NuxeoFileBlob(new FileBlob(buildFileFromStream(stream)));
+                    } else {
+                        logger.info("found target File via reflection ");
+                        return new NuxeoFileBlob(new FileBlob(targetFile));
+                    }
                 } catch (NoSuchMethodException e) {
                     logger.error("Can not find getCurrentFile method", e);
                 } catch (SecurityException e) {
@@ -587,16 +595,16 @@ public class NuxeoConnector extends BaseDocumentService {
     @Summary("converts a Nuxeo document to a Map")
     public static Map<String, Object> documentToMap(Document doc) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("type", doc.getType());
-        map.put("facets", doc.getFacets().list());
-        map.put("id", doc.getId());
-        map.put("lock", doc.getLock());
-        map.put("lockCreated", doc.getLockCreated());
-        map.put("lockOwner", doc.getLockOwner());
-        map.put("path", doc.getPath());
-        map.put("repository", doc.getRepository());
-        map.put("state", doc.getState());
-        map.put("properties", doc.getProperties().map());
+        map.put("ecm:type", doc.getType());
+        map.put("ecm:facets", doc.getFacets().list());
+        map.put("ecm:id", doc.getId());
+        map.put("ecm:lock", doc.getLock());
+        map.put("ecm:lockCreated", doc.getLockCreated());
+        map.put("ecm:lockOwner", doc.getLockOwner());
+        map.put("ecm:path", doc.getPath());
+        map.put("ecm:repository", doc.getRepository());
+        map.put("ecm:state", doc.getState());
+        map.putAll(doc.getProperties().map());
         return map;
     }
 
@@ -656,7 +664,7 @@ public class NuxeoConnector extends BaseDocumentService {
            getPollingClient().subscribe(config);
        } else {
            pendingListeners.add(config);
-           System.out.println("Pending Subscription");
+           logger.info("Pending Subscription");
        }
 
        return new StopSourceCallback() {
@@ -687,14 +695,12 @@ public class NuxeoConnector extends BaseDocumentService {
         List<MetaDataKey> types =  getIntrospector().getMuleTypes();
         for (MetaDataKey key : types) {
             logger.info("registering type " + key.getId() + " with display name " + key.getDisplayName());
-            System.out.println("registering type " + key.getId() + " with display name " + key.getDisplayName());
         }
         return types;
     }
 
     @MetaDataRetriever
     public MetaData getMetaData(MetaDataKey key) throws Exception {
-        System.out.println("retrieve metadata for " + key.getId());
         logger.info("retrieve metadata for " + key.getId());
         return getIntrospector().getMuleTypeMetaData(key.getId());
     }
