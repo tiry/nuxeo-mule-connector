@@ -15,11 +15,6 @@
       "facets" : [ ],
       "schemas" : [ "relation_search" ]
     },
-    "user_open_tasks_cv" : {
-      "parent" : "Document",
-      "facets" : [ "ContentViewDisplay" ],
-      "schemas" : [ "user_open_tasks_cv", "content_view_display" ]
-    },
     "PublicationRelation" : {
       "parent" : "Relation",
       "facets" : [ "HiddenInNavigation" ],
@@ -30,11 +25,6 @@
       "facets" : [ "HiddenInNavigation", "Folderish" ],
       "schemas" : [ "dublincore", "common" ]
     },
-    "NXDistribution" : {
-      "parent" : "Folder",
-      "facets" : [ "Commentable", "Versionable", "Folderish" ],
-      "schemas" : [ "common", "dublincore", "file", "nxdistribution" ]
-    },
     "AdministrativeStatusContainer" : {
       "parent" : "Folder",
       "facets" : [ "HiddenInNavigation", "Folderish" ],
@@ -44,16 +34,6 @@
       "parent" : "StepFolder",
       "facets" : [ "StepFolder", "DocumentRoute", "SystemDocument", "HiddenInNavigation", "Folderish", "Orderable" ],
       "schemas" : [ "document_route_instance", "document_route_model", "step_folder", "common", "dublincore" ]
-    },
-    "NXOperation" : {
-      "parent" : "Document",
-      "facets" : [ "Commentable", "Versionable" ],
-      "schemas" : [ "common", "dublincore", "file", "nxoperation" ]
-    },
-    "NXComponent" : {
-      "parent" : "Folder",
-      "facets" : [ "Commentable", "Versionable", "Folderish" ],
-      "schemas" : [ "common", "dublincore", "file", "nxcomponent" ]
     },
     "CommentRelation" : {
       "parent" : "Relation",
@@ -115,20 +95,10 @@
       "facets" : [ "TaskStep", "RouteStep", "Commentable", "CommentsInfoHolder", "SystemDocument" ],
       "schemas" : [ "conditional_task_step", "dublincore", "info_comments", "task_step" ]
     },
-    "NXBundle" : {
-      "parent" : "Folder",
-      "facets" : [ "Commentable", "Versionable", "Folderish" ],
-      "schemas" : [ "common", "dublincore", "file", "nxbundle" ]
-    },
     "StepFolder" : {
       "parent" : "OrderedFolder",
       "facets" : [ "StepFolder", "SystemDocument", "HiddenInNavigation", "Folderish", "Orderable" ],
       "schemas" : [ "step_folder", "common", "dublincore" ]
-    },
-    "NXDocumentation" : {
-      "parent" : "Document",
-      "facets" : [ "Commentable", "Versionable" ],
-      "schemas" : [ "common", "dublincore", "file", "files", "nxdocumentation" ]
     },
     "Forum" : {
       "parent" : "Folder",
@@ -238,20 +208,10 @@
       "facets" : [ "SuperSpace", "PublishSpace", "Folderish" ],
       "schemas" : [ "file", "common", "dublincore" ]
     },
-    "NXContribution" : {
-      "parent" : "Document",
-      "facets" : [ "Commentable", "Versionable" ],
-      "schemas" : [ "common", "dublincore", "file", "nxcontribution" ]
-    },
     "Root" : {
       "parent" : "Folder",
       "facets" : [ "Folderish" ],
       "schemas" : [ "common", "dublincore" ]
-    },
-    "NXExtensionPoint" : {
-      "parent" : "Folder",
-      "facets" : [ "Commentable", "Versionable", "Folderish" ],
-      "schemas" : [ "common", "dublincore", "file", "nxextensionpoint" ]
     },
     "UserProfile" : {
       "parent" : "Document",

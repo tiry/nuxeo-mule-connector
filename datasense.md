@@ -52,17 +52,33 @@ Typically, the `Document.Update` API will take as parameter a `PropertyMap` that
 
 ### Types exposed by the Connector
 
-For now, for each Document Type defined on the server, Nuxeo Connector exposes 2 types of objects :
-
- - Document object : the full Document object 
- - DataModel object : the `Map<String,Serializable>` properties object
+For now, for each Document Type defined on the server, Nuxeo Connector exposes as 1 type of objects :
 
 This means that for a Server that has 2 document types Note and File, Mule connector will expose :
 
- - DOC_File
- - DM_File
- - DOC_Note
- - DM_Note
+ - File
+ - Note
+
+This Mule Type object is similar to a big `Map<String,Object>`
+
+ - DocumentModel object attributes are mapped as properties with the `ecm` namespace
+
+        map.put("ecm:type", doc.getType());
+        map.put("ecm:facets", doc.getFacets().list());
+        map.put("ecm:id", doc.getId());
+        map.put("ecm:lock", doc.getLock());
+        map.put("ecm:lockCreated", doc.getLockCreated());
+        map.put("ecm:lockOwner", doc.getLockOwner());
+        map.put("ecm:path", doc.getPath());
+        map.put("ecm:repository", doc.getRepository());
+        map.put("ecm:state", doc.getState());
+
+ - all the DataModel properties are added to the same map
+
+    - dublincore properties will be accessible via : map.get("dc:title")
+    - note properties will be accessible via : map.get("note:note")
+
+NB : previous versions used to expose File_Doc and File_DM, but for simplicity everything has been aligned on 1 unique type.
 
 ### Method bindings
 
@@ -77,9 +93,9 @@ Here is a sample configuration for a DataMapper :
     Type : Connector
     Connector : Nuxeo
     By Type
-    Type : DOC_FILE
+    Type : File
 
-### Field names and ":"
+### Field names, ":", Mapper and problems
 
 Nuxeo fields names use prefix : `dc:description`, `file:content`, `note:note` ...
 
@@ -92,7 +108,33 @@ NB : here the *"Nuxeo object"* is the output.
 
 Does this mean that `":"` are prohibited in field names ?
 
-### Wrapping the Document object
+Here is a simple example flow :
+
+     http endpoint > Nuxeo Query > DocumentModelToMap transformer > Mapper > CSV
+
+    <flow name="TestFlowFlow1" doc:name="Test DataSense">
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP"/>
+        <nuxeo:query config-ref="Nuxeo" query="select * from Note" doc:name="Query"/>
+        <nuxeo:documents-to-list-of-map doc:name="Convert to Map"/>
+        <data-mapper:transform config-ref="new_mapping_grf" doc:name="DataMapper to CSV"/>
+    </flow>
+
+![Sample Flow](doc/images/datasensetest.png)
+
+![Sample Mapping using DataSensse ](doc/images/datasensemapping.png)
+
+The resulting MEL script is : 
+
+    output.uid = input.ecm_id;
+    output.title = input.dc_title;
+    output.note = input.note_note;
+    output.modified = input.dc_modified;
+
+Of course it does not work, but in fact the underlying object is never called : so I don't recieve any `get` call even for a bad propertyname
+
+### Additional questions 
+
+#### Wrapping the Document object
 
 The Document object is not a `Map` but a Pojo containing a Map.
 
@@ -105,7 +147,7 @@ If the answer is yes, I see 2 possibles approaches :
 
 I would prefer solution 2, but I can do solution 1 if needed.
 
-### Building Nuxeo Object
+#### Building Nuxeo Object
 
 When using a Mule Flow to build a Nuxeo Object via a DataMapper :
 

@@ -12,6 +12,7 @@ public class NuxeoFileBlob extends NuxeoBlob implements HasFile {
 
     public NuxeoFileBlob(FileBlob wrapped) {
         super(wrapped);
+        fileBlob = wrapped;
     }
 
     @Override

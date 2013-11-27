@@ -46,37 +46,18 @@ The connector include a first level (very naive) implementation of DataSense for
 
 As a start Nuxeo Document Types are mapped to `MetaDataKey`.
 
-For a given document type in Nuxeo 2 `MeteDataKey` are exposed :
+Since most Nuxeo operation don't have a docType parameter there is no type/method mapping. 
 
- - one for the `Document` object with the target doc type
- - one for a simple DataModel (Map) for the target doc type
+Nuxeo Document are mapped via DataSense as a big Map :
 
-For now, since Nuxeo operation don't have a docType parameter there is no direct mapping.
-
-For testing purpose, `updateds` that is bascially a DataSense aware copy of `update` operation was added.
-
-About DataSense / Nuxeo mapping :
-
-**Stream**
-
-One specific type of Nuxeo field are `Blob`.
-
-As a first reflex, Blob are mappoed to `DataType.STREAM` but this DataType is deprecated, not sure what the replacement must be ...
-
-**Scalar vs Complex field**
-
-Inside Nuxeo, a Document object is constituted of schemas, that contains fields.
-
-The fields can be : 
-
- - scalar : String, Long, Date ...
- - List of scalar : List  of String, List of Date ...
- - Complex type : can be almost any complex type as defined in the XSD standard, basically it means that a field that can seen as a map of other fields with potentially a very deep nesting
-
-DataSense mapping uses :
-
- - scalar for Nuxeo scalar fields
- - dynamicObject for Nuxeo complex fields
+ - Document attribute (name, parent, id, lifecycle ...) are mapped as `ecm:` properties
+     - `doc.get('ecm:name')`
+     - `doc.get('ecm:id')`
+ - All first level properties are mapped as simple keys
+     - `doc.get('dc:title)`
+     - `doc.get('dc:created)`
+ - Sub-properties are children of the first level properties
+     - `doc.get('file:content').get('name')`
 
 ## Nuxeo Connector vs CMIS Connector
 
