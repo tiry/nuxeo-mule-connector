@@ -25,7 +25,7 @@ Nuxeo API is highly dynamic since :
  - addons can provide additionnal Operations
  - new Operations or chains can be added via Nuxeo Studio, Java or scripting.
 
-The Mule Connector architecture is static and as is can not expose all Nuxeo API.
+The Mule Connector being statically build from annotations, we need some tricks to be able to expose all Nuxeo API.
 
 This connector exposes :
 
@@ -40,24 +40,45 @@ This connector exposes :
  - an event listener (@Source) that allows to make Mule listen to Nuxeo events
      - it uses long polling http to fetch events from Audit log
 
+### Nuxeo Documents, Converters and DataSense
+
+A lot of Nuxeo API expose objects like : Document or Documents (List<Document\>).
+
+    Get document : will return a Document object
+    Query        : will return a Documents object (List<Document>)
+
+The associated Java object can be directly manipulated using for example Groovy script :
+
+    doc.getId();
+    doc.getType();
+    doc.getProperties().get("dc:description");
+
+However, in some cases, it may be useful to be able to manipulate Document and Document as Map and List of Map.
+
+For that you can use the provider Converter.
+The generated map will be DataSense aware so that you can easily use the Mule DataMapper.
+
 ### DataSense
 
-The connector include a first level (very naive) implementation of DataSense for Nuxeo.
+Nuxeo Document Types are exposed as DataSense types (mapped to `MetaDataKey`).
 
-As a start Nuxeo Document Types are mapped to `MetaDataKey`.
+Nuxeo dynamic properties are not exposed with their native name to avoid some naming issues encountered (at least with certains versions of Mule).
 
-Since most Nuxeo operation don't have a docType parameter there is no type/method mapping. 
+When converted to a Map, Nuxeo Document properties are exposed with a `'__'` to replace the `':'`
 
-Nuxeo Document are mapped via DataSense as a big Map :
+     doc.getName()                                       
+         => map.get("ecm:name")                 
+                => map["ecm__name"]
 
- - Document attribute (name, parent, id, lifecycle ...) are mapped as `ecm:` properties
-     - `doc.get('ecm:name')`
-     - `doc.get('ecm:id')`
- - All first level properties are mapped as simple keys
-     - `doc.get('dc:title)`
-     - `doc.get('dc:created)`
- - Sub-properties are children of the first level properties
-     - `doc.get('file:content').get('name')`
+     doc.getProperties().get("dc:description")           
+         => map.get("dc:description")           
+                => map["dc__description"]
+
+     doc.getProperties().get("file:content").get("name") 
+         => map.get("file:content").get("name") 
+                => map["file:content"]["name"]
+
+see [datasense section](datasense.md) for more details.
 
 ## Nuxeo Connector vs CMIS Connector
 

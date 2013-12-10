@@ -27,6 +27,7 @@ public class MetaDataIntrospector {
 
     protected static final String DOC_PREFIX = "DOC_";
     protected static final String DATAMODEL_PREFIX = "DM_";
+
     protected TypeDefinitionFecther fetcher;
 
     public MetaDataIntrospector(Session session) {
@@ -45,10 +46,7 @@ public class MetaDataIntrospector {
     public List<MetaDataKey> getMuleTypes() {
         List<MetaDataKey> types = new ArrayList<MetaDataKey>();
         for (String docType : getDocTypes()) {
-            //types.add(new DefaultMetaDataKey(DOC_PREFIX + docType, DOC_PREFIX + docType, false));
             types.add(new DefaultMetaDataKey(docType, docType, false));
-            //types.add(new DefaultMetaDataKey(DOC_PREFIX + docType, docType + " (doctype)", false));
-            //types.add(new DefaultMetaDataKey(DATAMODEL_PREFIX + docType, docType + " (datamodel)", false));
         }
         Collections.sort(types);
         return types;
@@ -57,35 +55,20 @@ public class MetaDataIntrospector {
 
     public MetaData getMuleTypeMetaData(String key) {
 
-        //System.out.println("retrieve type " + key);
-
         DynamicObjectBuilder dynamicObject = new DefaultMetaDataBuilder().createDynamicObject(key);
-
         String targetDocType = key;
-
         buildMuleDocTypeMetaDataModel(targetDocType, dynamicObject);
-        /*
-        if (targetDocType.startsWith(DOC_PREFIX)) {
-            targetDocType = targetDocType.substring(DOC_PREFIX.length());
-            buildMuleDocTypeMetaDataModel(targetDocType, dynamicObject);
-        } else {
-            targetDocType = targetDocType.substring(DATAMODEL_PREFIX.length());
-            buildMuleDataModelMetaDataModel(targetDocType, dynamicObject);
-        }*/
         MetaDataModel model = dynamicObject.build();
 
         return new DefaultMetaData(model);
     }
 
-
     protected void buildMuleDocTypeMetaDataModel(String docType, DynamicObjectBuilder dynamicObject) {
-
-        dynamicObject.addSimpleField("ecm:path", getDataType("string"));
-        dynamicObject.addSimpleField("ecm:state", getDataType("string"));
-        dynamicObject.addSimpleField("ecm:repository", getDataType("string"));
-        dynamicObject.addSimpleField("ecm:id", getDataType("string"));
-        dynamicObject.addSimpleField("ecm:type", getDataType("string"));
-        //DynamicObjectFieldBuilder mapField = dynamicObject.addDynamicObjectField("properties");
+        dynamicObject.addSimpleField(DataSenseHelper.getDataSenseFieldName("ecm","path"), getDataType("string"));
+        dynamicObject.addSimpleField(DataSenseHelper.getDataSenseFieldName("ecm","state"), getDataType("string"));
+        dynamicObject.addSimpleField(DataSenseHelper.getDataSenseFieldName("ecm","repository"), getDataType("string"));
+        dynamicObject.addSimpleField(DataSenseHelper.getDataSenseFieldName("ecm", "id"), getDataType("string"));
+        dynamicObject.addSimpleField(DataSenseHelper.getDataSenseFieldName("ecm", "type"), getDataType("string"));
         buildMuleDataModelMetaDataModel(docType, dynamicObject);
     }
 
@@ -154,7 +137,7 @@ public class MetaDataIntrospector {
             type = type.substring(0, type.length()-2);
         }
         if ("blob".equals(type)) {
-            DynamicObjectBuilder blobField = dynamicObject.addDynamicObjectField(prefix + ":" + name);
+            DynamicObjectBuilder blobField = dynamicObject.addDynamicObjectField(DataSenseHelper.getDataSenseFieldName(prefix, name));
             blobField.addSimpleField("encoding", DataType.STRING);
             blobField.addSimpleField("mime-type", DataType.STRING);
             blobField.addSimpleField("name", DataType.STRING);
@@ -167,9 +150,9 @@ public class MetaDataIntrospector {
         if (subFields!=null) {
             DynamicObjectBuilder cplxField = null;
             if (multiValued) {
-                cplxField = dynamicObject.addListOfDynamicObjectField(prefix + ":" + name).addDynamicObjectField("item");
+                cplxField = dynamicObject.addListOfDynamicObjectField(DataSenseHelper.getDataSenseFieldName(prefix, name)).addDynamicObjectField("item");
             } else {
-                cplxField = dynamicObject.addDynamicObjectField(prefix + ":" + name);
+                cplxField = dynamicObject.addDynamicObjectField(DataSenseHelper.getDataSenseFieldName(prefix, name));
             }
             Iterator<String> fnames = subFields.getFieldNames();
             while (fnames.hasNext()) {
@@ -179,9 +162,9 @@ public class MetaDataIntrospector {
             }
         } else {
             if (multiValued) {
-                dynamicObject.addListOfDynamicObjectField(prefix + ":" + name).addSimpleField("item", getDataType(type));
+                dynamicObject.addListOfDynamicObjectField(DataSenseHelper.getDataSenseFieldName(prefix, name)).addSimpleField("item", getDataType(type));
             } else {
-                dynamicObject.addSimpleField(prefix + ":" + name, getDataType(type));
+                dynamicObject.addSimpleField(DataSenseHelper.getDataSenseFieldName(prefix, name), getDataType(type));
             }
         }
     }

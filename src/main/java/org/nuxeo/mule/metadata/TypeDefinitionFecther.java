@@ -30,14 +30,12 @@ public class TypeDefinitionFecther {
         }
     }
 
-
     public JsonNode fetch() {
 
         InputStream jsonStream = null;
 
         // try to  fetch remote
         // XXX
-
 
         // fallback to local static definition
         try {

@@ -52,7 +52,7 @@ Typically, the `Document.Update` API will take as parameter a `PropertyMap` that
 
 ### Types exposed by the Connector
 
-For now, for each Document Type defined on the server, Nuxeo Connector exposes as 1 type of objects :
+For now, for each Document Type defined on the server, Nuxeo Connector exposes as 1 *"DataSense type"*.
 
 This means that for a Server that has 2 document types Note and File, Mule connector will expose :
 
@@ -77,8 +77,6 @@ This Mule Type object is similar to a big `Map<String,Object>`
 
     - dublincore properties will be accessible via : map.get("dc:title")
     - note properties will be accessible via : map.get("note:note")
-
-NB : previous versions used to expose File_Doc and File_DM, but for simplicity everything has been aligned on 1 unique type.
 
 ### Method bindings
 

@@ -594,7 +594,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { Document.class })
     @Summary("converts a Nuxeo document to a Map")
     public static Map<String, Object> documentToMap(Document doc) {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new NxMap();
         map.put("ecm:type", doc.getType());
         map.put("ecm:facets", doc.getFacets().list());
         map.put("ecm:id", doc.getId());
@@ -605,7 +605,14 @@ public class NuxeoConnector extends BaseDocumentService {
         map.put("ecm:repository", doc.getRepository());
         map.put("ecm:state", doc.getState());
         map.putAll(doc.getProperties().map());
+        //  dump(map);
         return map;
+    }
+
+    protected static void dump(Map<String, Object> map) {
+        for (String k : map.keySet()){
+            System.out.println(k + " => " + map.get(k));
+        }
     }
 
     /**
