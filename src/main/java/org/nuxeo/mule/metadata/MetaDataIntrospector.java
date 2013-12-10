@@ -91,7 +91,7 @@ public class MetaDataIntrospector {
         }
 
         if ("blob".equalsIgnoreCase(nxFieldType)) {
-            return DataType.STREAM;
+            return DataType.STRING;
         }
 
         // XXX
@@ -143,7 +143,7 @@ public class MetaDataIntrospector {
             blobField.addSimpleField("name", DataType.STRING);
             blobField.addSimpleField("length", DataType.LONG);
             blobField.addSimpleField("digest", DataType.STRING);
-            blobField.addSimpleField("data", DataType.STREAM);
+            blobField.addSimpleField("data", DataType.STRING);
             return;
         }
 
@@ -158,7 +158,8 @@ public class MetaDataIntrospector {
             while (fnames.hasNext()) {
                 String subFieldName = fnames.next();
                 JsonNode subfield = subFields.get(subFieldName);
-                addField(prefix, name + "/" + subFieldName, subfield, cplxField);
+                addField(prefix, subFieldName, subfield, cplxField);
+                //addField(prefix, name + "/" + subFieldName, subfield, cplxField);
             }
         } else {
             if (multiValued) {

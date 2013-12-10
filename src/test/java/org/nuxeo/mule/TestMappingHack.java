@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.nuxeo.ecm.automation.client.model.Blob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
+import org.nuxeo.mule.mapper.MuleTranslatedMap;
 
 public class TestMappingHack {
 
@@ -19,7 +20,7 @@ public class TestMappingHack {
         String[] arrayValue1 = new String[]{"toto", "titi"};
 
         // init map using Nuxeo interface name system
-        NxMap nxMap = new NxMap();
+        MuleTranslatedMap nxMap = new MuleTranslatedMap();
         nxMap.put("dc:title", titleValue1);
         nxMap.put("dc:created", dateValue1);
         nxMap.put("file:content", blobValue1);

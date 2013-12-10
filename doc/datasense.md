@@ -136,42 +136,6 @@ Currently Blob are mapped with DataSense using :
 
 The type DataType.STREAM seems to be deprecated : but what is the recommanded approach for Streams ?
 
-### Nested complex types
-
-Fields can be complex : a field can actually be a map of sub fields.
-
-If we take the example of `file:content`, we have :
-
-     map.get("file:content").get("name") => name of the file
-     map.get("file:content").get("length") => length of the file
-
-The Document2Map converter does the jobs and when using a Groovy component, we can easily access nested properties : 
-
-     return payload.get("file:content").get("name")
-
-However, we using the DataMapper, the same binding fails :
-
-![Sample Mapping](images/DataSense_nestedFields.png)
-
-The generated script seems ok :
-
-     output.title = input.dc__title;
-     output.filename = input.name;
-     output.created = (isnull(input.dc__created) ? null : calendar2date(input.dc__created));
-
-As well as the xml (in GRF file) also seems ok : 
-
-     <Field __implementationClass="java.lang.String" 
-            __index="5" 
-            __sourcePath="{}/File/file_x005f_x005fcontent/name" 
-            containerType="SINGLE" label="name" name="name" 
-            type="string"/>
-
-However, in the resulting Map the `filename` field is missing :
-
-      {"title":"Picture","created":1386257135930}
-
-
 ### Field names, ":", Mapper and problems
 
 Nuxeo fields names use prefix : `dc:description`, `file:content`, `note:note` ...

@@ -60,6 +60,7 @@ import org.nuxeo.ecm.automation.client.model.StreamBlob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
 import org.nuxeo.mule.blob.NuxeoBlob;
 import org.nuxeo.mule.blob.NuxeoFileBlob;
+import org.nuxeo.mule.mapper.Doc2Map;
 import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
 import org.nuxeo.mule.poll.ListenerConfig;
@@ -594,25 +595,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { Document.class })
     @Summary("converts a Nuxeo document to a Map")
     public static Map<String, Object> documentToMap(Document doc) {
-        Map<String, Object> map = new NxMap();
-        map.put("ecm:type", doc.getType());
-        map.put("ecm:facets", doc.getFacets().list());
-        map.put("ecm:id", doc.getId());
-        map.put("ecm:lock", doc.getLock());
-        map.put("ecm:lockCreated", doc.getLockCreated());
-        map.put("ecm:lockOwner", doc.getLockOwner());
-        map.put("ecm:path", doc.getPath());
-        map.put("ecm:repository", doc.getRepository());
-        map.put("ecm:state", doc.getState());
-        map.putAll(doc.getProperties().map());
-        //  dump(map);
-        return map;
-    }
-
-    protected static void dump(Map<String, Object> map) {
-        for (String k : map.keySet()){
-            System.out.println(k + " => " + map.get(k));
-        }
+       return Doc2Map.documentToMap(doc);
     }
 
     /**
@@ -627,11 +610,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { Documents.class })
     @Summary("converts lists of documents to lists of Map")
     public static List<Map<String, Object>> documentsToListOfMap(Documents docs) {
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-        for (Document doc : docs) {
-            result.add(documentToMap(doc));
-        }
-        return result;
+        return Doc2Map.documentsToListOfMap(docs);
     }
 
     @Start
