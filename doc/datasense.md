@@ -167,6 +167,11 @@ As well as the xml (in GRF file) also seems ok :
             containerType="SINGLE" label="name" name="name" 
             type="string"/>
 
+However, in the resulting Map the `filename` field is missing :
+
+      {"title":"Picture","created":1386257135930}
+
+
 ### Field names, ":", Mapper and problems
 
 Nuxeo fields names use prefix : `dc:description`, `file:content`, `note:note` ...
