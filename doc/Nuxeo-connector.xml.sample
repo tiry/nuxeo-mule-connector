@@ -132,7 +132,6 @@
             </nuxeo:event-names>
      </nuxeo:register-listener>
 <!-- END_INCLUDE(nuxeo:register-listener) -->
-
 <!-- BEGIN_INCLUDE(nuxeo:document-to-map) -->
   <nuxeo:document-to-map />
 <!-- END_INCLUDE(nuxeo:document-to-map) -->
@@ -142,6 +141,12 @@
 <!-- BEGIN_INCLUDE(nuxeo:file-to-blob) -->
   <nuxeo:file-to-blob />
 <!-- END_INCLUDE(nuxeo:file-to-blob) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-as-stream) -->
+  <nuxeo:get-as-stream input-ref="#payload"/>
+<!-- END_INCLUDE(nuxeo:get-as-stream) -->
+<!-- BEGIN_INCLUDE(nuxeo:get-as-blob) -->
+  <nuxeo:get-as-blob input-ref="#payload" />
+<!-- END_INCLUDE(nuxeo:get-as-blob) -->
 <!-- BEGIN_INCLUDE(nuxeo:string-to-blob) -->
  <nuxeo:string-to-blob />
 <!-- END_INCLUDE(nuxeo:string-to-blob) -->

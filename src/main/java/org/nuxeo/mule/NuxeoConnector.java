@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -49,21 +50,25 @@ import org.nuxeo.ecm.automation.client.AutomationClient;
 import org.nuxeo.ecm.automation.client.OperationRequest;
 import org.nuxeo.ecm.automation.client.adapters.DocumentService;
 import org.nuxeo.ecm.automation.client.jaxrs.impl.HttpAutomationClient;
+import org.nuxeo.ecm.automation.client.model.Blob;
 import org.nuxeo.ecm.automation.client.model.DocRef;
 import org.nuxeo.ecm.automation.client.model.Document;
 import org.nuxeo.ecm.automation.client.model.Documents;
 import org.nuxeo.ecm.automation.client.model.FileBlob;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
+import org.nuxeo.ecm.automation.client.model.PropertyMap;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
 import org.nuxeo.ecm.automation.client.model.StreamBlob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
+import org.nuxeo.mule.blob.BlobConverters;
 import org.nuxeo.mule.blob.NuxeoBlob;
 import org.nuxeo.mule.blob.NuxeoFileBlob;
 import org.nuxeo.mule.mapper.Doc2Map;
 import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
 import org.nuxeo.mule.poll.ListenerConfig;
+
 /**
  * Connector that uses Nuxeo Automation java client to leverage Nuxeo Rest API
  *
@@ -237,14 +242,15 @@ public class NuxeoConnector extends BaseDocumentService {
     }
 
     protected String getServerUrl() {
-        if (protocol==null) {
+        if (protocol == null) {
             protocol = "http";
         }
         if (contextPath == null || contextPath.isEmpty()) {
-            return protocol + "://" + serverName + ":" + port + "/" + "automation";
+            return protocol + "://" + serverName + ":" + port + "/"
+                    + "automation";
         } else {
-            return protocol + "://" + serverName + ":" + port + "/" + contextPath
-                    + "/site/automation";
+            return protocol + "://" + serverName + ":" + port + "/"
+                    + contextPath + "/site/automation";
         }
     }
 
@@ -484,20 +490,67 @@ public class NuxeoConnector extends BaseDocumentService {
     }
 
     /**
+     * Get an {@link InputStream} from a {@link Blob}, or a {@link Map}
+     * representing a Blob in a Document
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-as-stream}
+     *
+     * @param input the {@link PropertyMap}, {@link Map} or {@link Blob}
+     * @return the {@link InputStream} if any
+     */
+    //@Transformer(sourceTypes = { PropertyMap.class, Map.class, Blob.class })
+    @Processor
+    @Category(name = "Dynamic Converters", description = "converts a Blob or a Map representing a Blob to a Stream")
+    public InputStream getAsStream(@Placement(group = "input (PropertyMap.class, Map.class, Blob.class)") Object input) {
+        try {
+            return BlobConverters.blobToStream(session, input);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Unable to get Stream from Blob", e);
+            return null;
+        }
+    }
+
+    /**
+     * Get an {@link Blob} from a {@link Map} of properties representing a Blob in the Document
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:get-as-blob}
+     *
+     * @param input the {@link PropertyMap}, {@link Map}
+     * @return the {@link InputStream} if any
+     */
+    //@Transformer(sourceTypes = { PropertyMap.class, Map.class })
+    @Processor
+    @Category(name = "Dynamic Converters", description = "converts a Map representing a Blob to a Blob")
+    public Blob getAsBlob(@Placement(group = "input (PropertyMap.class, Map.class)") Object input) {
+        try {
+            return BlobConverters.mapToBlob(session, input);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Unable to get Blob from input", e);
+            return null;
+        }
+    }
+
+
+    /**
      * Register an event listener on the Nuxeo side that will callback Mule on
      * an automatically generated endpoint, passing the list of events as
      * payload
      *
-     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:register-listener}
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:register-listener}
      *
-     * @param eventNames lists of events to listen to, ca be null to listen to all events
-     * @param categories lists of event categories to listen to, ca be null to listen to all categories
+     * @param eventNames lists of events to listen to, ca be null to listen to
+     *            all events
+     * @param categories lists of event categories to listen to, ca be null to
+     *            listen to all categories
      * @param repository target repository
-     * @param userName listen only to events generated by a given user, can be null to listen to all users
-     * @param docId listen only to events generated for a given doc, can be null to listen to all docs
+     * @param userName listen only to events generated by a given user, can be
+     *            null to listen to all users
+     * @param docId listen only to events generated for a given doc, can be null
+     *            to listen to all docs
      * @param eventCallBack the inbout callback endpoint
      */
-    //@Processor
+    // @Processor
     public void registerListener(@Optional
     List<String> eventNames, @Optional
     List<String> categories, @Optional
@@ -513,13 +566,6 @@ public class NuxeoConnector extends BaseDocumentService {
 
     /****************************** Transformers **************/
 
-    protected static File buildFileFromStream(InputStream stream) throws IOException {
-        File tmp = File.createTempFile("nuxeo", ".mule");
-        Files.copy(stream, tmp.toPath());
-        tmp.deleteOnExit();
-        return tmp;
-    }
-
     /**
      * Creates a Blob from a File or a FileInputStream
      *
@@ -528,45 +574,13 @@ public class NuxeoConnector extends BaseDocumentService {
      * @param input the input File
      * @return the Blob wrapping the File
      */
-    @Transformer(sourceTypes = { File.class, FileInputStream.class, byte[].class })
+    @Transformer(sourceTypes = { File.class, FileInputStream.class,
+            byte[].class })
     @Summary("converts a File to a Blob")
     public static NuxeoBlob fileToBlob(Object input) {
-        logger.info("Converting " + input.getClass().getName() + " to Nuxeo Blob");
-        if (input instanceof File) {
-            logger.info("Creating FileBlob");
-            return new NuxeoFileBlob(new FileBlob((File)input));
-        } else if (input instanceof FileInputStream) {
-            logger.info("Creating StreamBlob");
-            FileInputStream stream = (FileInputStream) input;
-            if (input.getClass().getSimpleName().contains("ReceiverFileInputStream")) {
-                // hack because this f**cking class is private !
-                try {
-                    Method hiddentGetter = input.getClass().getDeclaredMethod("getCurrentFile", null);
-                    hiddentGetter.setAccessible(true);
-                    File targetFile = (File) hiddentGetter.invoke(input);
-                    if (targetFile==null) {
-                        logger.info("target File is null");
-                        return new NuxeoFileBlob(new FileBlob(buildFileFromStream(stream)));
-                    } else {
-                        logger.info("found target File via reflection ");
-                        return new NuxeoFileBlob(new FileBlob(targetFile));
-                    }
-                } catch (NoSuchMethodException e) {
-                    logger.error("Can not find getCurrentFile method", e);
-                } catch (SecurityException e) {
-                    logger.error("Can not access getCurrentFile method", e);
-                } catch (Exception e) {
-                    logger.error("Can not execute getCurrentFile method", e);
-                }
-            }
-            return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
-        } else if (input instanceof byte[]) {
-            logger.info("Creating ByteArray Blob");
-            ByteArrayInputStream stream = new ByteArrayInputStream((byte[]) input);
-            return new NuxeoBlob(new StreamBlob(stream,"mule.blob", "application/octet-stream"));
-        }
-        return null;
+        return BlobConverters.fileToBlob(input);
     }
+
 
     /**
      * Creates a Blob from a String
@@ -595,7 +609,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Transformer(sourceTypes = { Document.class })
     @Summary("converts a Nuxeo document to a Map")
     public static Map<String, Object> documentToMap(Document doc) {
-       return Doc2Map.documentToMap(doc);
+        return Doc2Map.documentToMap(doc);
     }
 
     /**
@@ -616,7 +630,7 @@ public class NuxeoConnector extends BaseDocumentService {
     @Start
     public void init() throws MuleException {
         logger.info("Starting Nuxeo Connector");
-        if (isConnected() && pendingListeners.size()>0) {
+        if (isConnected() && pendingListeners.size() > 0) {
             for (ListenerConfig config : pendingListeners) {
                 getPollingClient().subscribe(config);
             }
@@ -625,8 +639,9 @@ public class NuxeoConnector extends BaseDocumentService {
     }
 
     protected EventPollingClient getPollingClient() {
-        if (eventPollingClient==null && session!=null) {
-            eventPollingClient = new EventPollingClient(session, pollingInterval);
+        if (eventPollingClient == null && session != null) {
+            eventPollingClient = new EventPollingClient(session,
+                    pollingInterval);
         }
         return eventPollingClient;
     }
@@ -643,24 +658,26 @@ public class NuxeoConnector extends BaseDocumentService {
     @Source(primaryNodeOnly = true, threadingModel = SourceThreadingModel.NONE)
     @Summary("listen to events on a remote Nuxeo server")
     public StopSourceCallback listenToEvents(
-            /*@Placement(group = "Events filtering") List<String> eventNames, @Placement(group = "Events filtering")  Map<EventFilter, String> filters,*/  final SourceCallback callback) {
+    /*
+     * @Placement(group = "Events filtering") List<String> eventNames,
+     * @Placement(group = "Events filtering") Map<EventFilter, String> filters,
+     */final SourceCallback callback) {
 
-       ListenerConfig config = new ListenerConfig(null, callback);
-       if (this.isConnected()) {
-           getPollingClient().subscribe(config);
-       } else {
-           pendingListeners.add(config);
-           logger.info("Pending Subscription");
-       }
+        ListenerConfig config = new ListenerConfig(null, callback);
+        if (this.isConnected()) {
+            getPollingClient().subscribe(config);
+        } else {
+            pendingListeners.add(config);
+            logger.info("Pending Subscription");
+        }
 
-       return new StopSourceCallback() {
+        return new StopSourceCallback() {
             @Override
             public void stop() throws Exception {
                 getPollingClient().unsubscribe();
             }
         };
     }
-
 
     // ******************************************************************
     //
@@ -670,7 +687,7 @@ public class NuxeoConnector extends BaseDocumentService {
     //
 
     protected MetaDataIntrospector getIntrospector() {
-        if (introspector==null) {
+        if (introspector == null) {
             introspector = new MetaDataIntrospector(session);
         }
         return introspector;
@@ -678,9 +695,10 @@ public class NuxeoConnector extends BaseDocumentService {
 
     @MetaDataKeyRetriever
     public List<MetaDataKey> getMetaDataKeys() throws Exception {
-        List<MetaDataKey> types =  getIntrospector().getMuleTypes();
+        List<MetaDataKey> types = getIntrospector().getMuleTypes();
         for (MetaDataKey key : types) {
-            logger.info("registering type " + key.getId() + " with display name " + key.getDisplayName());
+            logger.info("registering type " + key.getId()
+                    + " with display name " + key.getDisplayName());
         }
         return types;
     }
