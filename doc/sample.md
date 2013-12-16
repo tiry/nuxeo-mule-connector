@@ -39,7 +39,7 @@ In order to build and run this project you'll need:
 
 <a name="step-1"></a>
 
-Follow instructions on [Adminsitration and Installation](http://doc.nuxeo.com/display/public/ADMINDOC/Installation) documentation of Nuxeo.
+Follow instructions on [Adminsitration and Installation](http://doc.nuxeo.com/display/public/ADMINDOC/Installation) documentation of Nuxeo. You may also want to customize your Nuxeo Set up using [Nuxeo Studio](http://doc.nuxeo.com/x/bgTF).
 
 ### Step 2: Install Mule Nuxeo Connector from update Site
 
@@ -166,6 +166,11 @@ Set the variable "filename" to #[message.inboundProperties['originalFilename']].
 You can also copy past the [XML flow](demo.mflow) and change a few config elements (mainly fs paths).
 
 Note: You could also have used the operation "FileManager.Import" so as to create the document and upload the file in one step. In the flow we chose to detail, you controle everything: type of the created document, title, name of the file, … Using FileManager.Import will provide a much shorter flow, though with less control on what is done, but may suit simple file upload use case!
+
+#### Use the Nuxeo event polling endpoint.
+
+1. Create a new flow File, call it "pollingEventsFromNuxeo"
+
 
 
 ### Other Resources
