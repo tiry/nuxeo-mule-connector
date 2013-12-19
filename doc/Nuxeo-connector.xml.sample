@@ -141,6 +141,9 @@
 <!-- BEGIN_INCLUDE(nuxeo:file-to-blob) -->
   <nuxeo:file-to-blob />
 <!-- END_INCLUDE(nuxeo:file-to-blob) -->
+<!-- BEGIN_INCLUDE(nuxeo:blob-to-file) -->
+  <nuxeo:blob-to-file />
+<!-- END_INCLUDE(nuxeo:blob-to-file) -->
 <!-- BEGIN_INCLUDE(nuxeo:get-as-stream) -->
   <nuxeo:get-as-stream input-ref="#payload"/>
 <!-- END_INCLUDE(nuxeo:get-as-stream) -->

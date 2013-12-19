@@ -38,6 +38,7 @@ import org.mule.api.annotations.display.Password;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.display.Summary;
 import org.mule.api.annotations.lifecycle.Start;
+import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
@@ -597,6 +598,27 @@ public class NuxeoConnector extends BaseDocumentService {
         return new NuxeoBlob(new StringBlob(input));
     }
 
+
+    /**
+     * Convert a Blob to a File
+     *
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:blob-to-file}
+     *
+     * @param blob the input blob
+     * @return the File extracted from the Blob
+     */
+    @Transformer(sourceTypes = { Blob.class })
+    @Summary("converts a Blob to a File")
+    public static File blobToFile(Blob blob) {
+        try {
+            return BlobConverters.blobToFile(blob);
+        } catch (Exception e) {
+            logger.error("Failed to extract File from Blob", e);
+            return null;
+        }
+    }
+
     /**
      * Convert a Document to a Simple Map
      *
@@ -635,6 +657,16 @@ public class NuxeoConnector extends BaseDocumentService {
                 getPollingClient().subscribe(config);
             }
             introspector = new MetaDataIntrospector(session);
+        }
+    }
+
+    @Stop
+    public void tearDown() {
+        logger.info("Stoping Nuxeo Connector");
+        try {
+            BlobConverters.cleanup();
+        } catch (Exception e) {
+            logger.error("Error during cleanup", e);
         }
     }
 
