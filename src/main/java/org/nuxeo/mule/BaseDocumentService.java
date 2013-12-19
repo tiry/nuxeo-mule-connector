@@ -7,7 +7,7 @@ import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.display.FriendlyName;
 import org.mule.api.annotations.display.Placement;
 import org.mule.api.annotations.param.Default;
-import org.mule.api.annotations.param.MetaDataKeyParam;
+import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.Optional;
 import org.nuxeo.ecm.automation.client.Constants;
 import org.nuxeo.ecm.automation.client.OperationRequest;
@@ -22,7 +22,6 @@ import org.nuxeo.ecm.automation.client.model.PropertyMap;
 import org.nuxeo.mule.blob.NuxeoBlob;
 import org.nuxeo.mule.mapper.MapUnmangler;
 
-
 /**
  * Stupid code to Map Operation already hard-coded in DocumentService.
  *
@@ -32,6 +31,8 @@ import org.nuxeo.mule.mapper.MapUnmangler;
  *
  */
 public class BaseDocumentService {
+
+    public static final String AUTOMATION_CONTEXT_KEY = "automationContext";
 
     protected DocumentService docService;
 
@@ -361,9 +362,9 @@ public class BaseDocumentService {
     public Document update(@Placement(group = "operation parameters")
     String doc, @Placement(group = "operation parameters")
     Map<String, Object> properties) throws Exception {
-        return docService.update(new DocRef(doc), MapUnmangler.unMangle(properties));
+        return docService.update(new DocRef(doc),
+                MapUnmangler.unMangle(properties));
     }
-
 
     /**
      * Updates a Document with DataSense
@@ -376,12 +377,14 @@ public class BaseDocumentService {
      * @return a Document Object
      * @throws Exception if operation can not be executed
      */
-    /*@Processor
-    public Document updateds(@MetaDataKeyParam @Placement(group = "operation parameters") @FriendlyName("doc type") String type, @Placement(group = "operation parameters")
-   String doc, @Placement(group = "operation parameters")
-    Map<String, Object> properties) throws Exception {
-        return docService.update(new DocRef(doc), new PropertyMap(properties));
-    }*/
+    /*
+     * @Processor public Document updateds(@MetaDataKeyParam @Placement(group =
+     * "operation parameters") @FriendlyName("doc type") String type,
+     * @Placement(group = "operation parameters") String doc, @Placement(group =
+     * "operation parameters") Map<String, Object> properties) throws Exception
+     * { return docService.update(new DocRef(doc), new PropertyMap(properties));
+     * }
+     */
 
     /**
      * Publish a Document
@@ -463,8 +466,8 @@ public class BaseDocumentService {
     @Placement(group = "operation parameters")
     String xpath) throws Exception {
 
-        OperationRequest req = session.newRequest(docService.SetBlob).setInput(blob).set(
-                "document", doc);
+        OperationRequest req = session.newRequest(docService.SetBlob).setInput(
+                blob).set("document", doc);
         if (xpath != null) {
             req.set("xpath", xpath);
         }
@@ -511,12 +514,13 @@ public class BaseDocumentService {
     @Optional
     @Default("")
     String xpath) throws Exception {
-        OperationRequest req = session.newRequest(docService.GetBlob).setInput(doc);
+        OperationRequest req = session.newRequest(docService.GetBlob).setInput(
+                doc);
         if (xpath != null) {
             req.set("xpath", xpath);
         }
         return new NuxeoBlob((Blob) req.execute());
-     }
+    }
 
     /**
      * Creates a version
@@ -568,9 +572,9 @@ public class BaseDocumentService {
     protected OperationInput getInput(Object blobOrDoc) {
         OperationInput in = null;
         if (blobOrDoc instanceof String) {
-            in =  DocRef.newRef((String) blobOrDoc);
+            in = DocRef.newRef((String) blobOrDoc);
         } else if (blobOrDoc instanceof Document) {
-            in =  DocRef.newRef(((Document) blobOrDoc).getId());
+            in = DocRef.newRef(((Document) blobOrDoc).getId());
         } else if (blobOrDoc instanceof Blob) {
             in = (Blob) blobOrDoc;
         }
@@ -578,7 +582,7 @@ public class BaseDocumentService {
     }
 
     /**
-     * convert the input Blob  as PDF
+     * convert the input Blob as PDF
      *
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:blob-to-pdf}
      *
@@ -590,15 +594,16 @@ public class BaseDocumentService {
     @Processor
     public NuxeoBlob blobToPdf(@Placement(group = "operation parameters")
     Object blobOrDoc) throws Exception {
-        OperationRequest req = session.newRequest("Blob.ToPDF").setInput(getInput(blobOrDoc));
+        OperationRequest req = session.newRequest("Blob.ToPDF").setInput(
+                getInput(blobOrDoc));
         return new NuxeoBlob((Blob) req.execute());
     }
-
 
     /**
      * resize the input Blob Picture
      *
-     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:resize-picture}
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:resize-picture}
      *
      * @param blobOrDoc blob or document that contains the picture
      * @param maxWidth target maximum Width in pixels
@@ -610,10 +615,13 @@ public class BaseDocumentService {
      */
     @Processor
     public NuxeoBlob resizePicture(@Placement(group = "operation parameters")
-    Object blobOrDoc,
-    @Placement(group = "operation parameters") @Optional Integer maxWidth,
-    @Placement(group = "operation parameters") @Optional Integer maxHeight) throws Exception {
-        OperationRequest req = session.newRequest("Picture.resize").setInput(getInput(blobOrDoc));
+    Object blobOrDoc, @Placement(group = "operation parameters")
+    @Optional
+    Integer maxWidth, @Placement(group = "operation parameters")
+    @Optional
+    Integer maxHeight) throws Exception {
+        OperationRequest req = session.newRequest("Picture.resize").setInput(
+                getInput(blobOrDoc));
         if (maxWidth != null) {
             req.set("maxWidth", maxWidth);
         }
@@ -629,7 +637,8 @@ public class BaseDocumentService {
      * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:import-file}
      *
      * @param blobOrDoc blob or document that contains the picture
-     * @param overwrite define if existing  document should be overriden
+     * @param overwrite define if existing document should be overriden
+     * @param inbound inbound headers that can hold some automation Context info
      *
      * @return the created Document
      *
@@ -637,20 +646,27 @@ public class BaseDocumentService {
      */
     @Processor
     public Document importFile(@Placement(group = "operation parameters")
-    NuxeoBlob blobOrDoc,
-    @Placement(group = "operation parameters") @Optional @Default("false") boolean overwrite) throws Exception {
+    NuxeoBlob blobOrDoc, @Placement(group = "operation parameters")
+    @Optional
+    @Default("false")
+    boolean overwrite, @InboundHeaders("*")
+    final Map<String, Object> inbound) throws Exception {
 
-        OperationRequest req = session.newRequest("FileManager.Import").setInput(getInput(blobOrDoc));
+        OperationRequest req = session.newRequest("FileManager.Import").setInput(
+                getInput(blobOrDoc));
+
+        propagateAutomationContext(inbound, req);
+
         req.set("overwrite", overwrite);
         return (Document) req.execute();
     }
-
 
     /**
      *
      * Starts the workflow with the given model id on the input documents
      *
-     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:start-workflow}
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:start-workflow}
      *
      * @param docRef target Document the Workflow should be started on
      * @param workflowId uuid of the workflow to be started
@@ -659,17 +675,20 @@ public class BaseDocumentService {
      *
      * @return the doc
      *
-     * @throws Exception  if operation can not be executed
+     * @throws Exception if operation can not be executed
      */
     @Processor
-    public Document startWorkflow(
-        @Placement(group = "operation parameters") String docRef,
-        @Placement(group = "operation parameters") String workflowId,
-        @Placement(group = "operation parameters") @Optional @Default("false")  boolean start,
-        @Placement(group = "operation parameters") @Optional Map<String, Object> wfVars) throws Exception
-        {
+    public Document startWorkflow(@Placement(group = "operation parameters")
+    String docRef, @Placement(group = "operation parameters")
+    String workflowId, @Placement(group = "operation parameters")
+    @Optional
+    @Default("false")
+    boolean start, @Placement(group = "operation parameters")
+    @Optional
+    Map<String, Object> wfVars) throws Exception {
 
-        OperationRequest req = session.newRequest("Context.StartWorkflow").setInput(DocRef.newRef(docRef));
+        OperationRequest req = session.newRequest("Context.StartWorkflow").setInput(
+                DocRef.newRef(docRef));
         req.set("Id", workflowId);
         req.set("start", start);
         req.set("variables", MapUnmangler.unMangle(wfVars));
@@ -679,22 +698,23 @@ public class BaseDocumentService {
     /**
      * Cancel the workflow with the given id,
      *
-     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample nuxeo:cancel-workflow}
+     * {@sample.xml ../../../doc/Nuxeo-connector.xml.sample
+     * nuxeo:cancel-workflow}
      *
-     * @param workflowId the id of the Document that represents the target Workflow
+     * @param workflowId the id of the Document that represents the target
+     *            Workflow
      *
      * @return the input Doc
      *
-     * @throws Exception  if operation can not be executed
+     * @throws Exception if operation can not be executed
      */
     @Processor
-    public Document cancelWorkflow(
-    @Placement(group = "operation parameters") String workflowId) throws Exception {
+    public Document cancelWorkflow(@Placement(group = "operation parameters")
+    String workflowId) throws Exception {
         OperationRequest req = session.newRequest("Context.CancelWorkflow");
         req.set("Id", workflowId);
         return (Document) req.execute();
     }
-
 
     /**
      * Completes the input task document.
@@ -707,21 +727,35 @@ public class BaseDocumentService {
      *
      * @return the task document
      *
-     * @throws Exception  if operation can not be executed
+     * @throws Exception if operation can not be executed
      */
     @Processor
-    public Document completeTask(
-    @Placement(group = "operation parameters") String docRef,
-    @Placement(group = "operation parameters") @Optional String comment,
-    @Placement(group = "operation parameters") @Optional String status) throws Exception {
-        OperationRequest req = session.newRequest("Workflow.CompleteTaskOperation").setInput(DocRef.newRef(docRef));
-        if(comment!=null) {
+    public Document completeTask(@Placement(group = "operation parameters")
+    String docRef, @Placement(group = "operation parameters")
+    @Optional
+    String comment, @Placement(group = "operation parameters")
+    @Optional
+    String status) throws Exception {
+        OperationRequest req = session.newRequest(
+                "Workflow.CompleteTaskOperation").setInput(
+                DocRef.newRef(docRef));
+        if (comment != null) {
             req.set("comment", comment);
         }
-        if(status!=null) {
+        if (status != null) {
             req.set("status", status);
         }
         return (Document) req.execute();
+    }
+
+    protected void propagateAutomationContext(Map<String, Object> inbound,
+            OperationRequest req) {
+        if (inbound != null && inbound.containsKey(AUTOMATION_CONTEXT_KEY)) {
+            Map<String, Object> ctx = (Map<String, Object>) inbound.get(AUTOMATION_CONTEXT_KEY);
+            for (String key : ctx.keySet()) {
+                req.setContextProperty(key, ctx.get(key));
+            }
+        }
     }
 
 }

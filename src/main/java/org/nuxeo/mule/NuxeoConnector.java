@@ -35,6 +35,7 @@ import org.mule.api.annotations.lifecycle.Start;
 import org.mule.api.annotations.lifecycle.Stop;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
+import org.mule.api.annotations.param.InboundHeaders;
 import org.mule.api.annotations.param.Optional;
 import org.mule.api.callback.HttpCallback;
 import org.mule.api.callback.SourceCallback;
@@ -443,6 +444,8 @@ public class NuxeoConnector extends BaseDocumentService {
      * @param operationId Name of the Automation Operation
      * @param input Input of the Operation
      * @param params Parameters of the Operation
+     * @param inbound inbound headers that can hold some automation Context info
+     *
      * @return Result of the Operation
      * @throws Exception if operation can not be executed
      */
@@ -453,9 +456,12 @@ public class NuxeoConnector extends BaseDocumentService {
     @Optional
     Object input, @Optional
     @Placement(group = "operation parameters")
-    Map<String, String> params) throws Exception {
+    Map<String, String> params,
+    @InboundHeaders("*") final Map<String, Object> inbound) throws Exception {
         OperationRequest request = session.newRequest(operationId);
         OperationDocumentation opDef = request.getOperation();
+
+        propagateAutomationContext(inbound, request);
 
         // fill operation parameter according to signature
         for (Param param : opDef.getParams()) {
