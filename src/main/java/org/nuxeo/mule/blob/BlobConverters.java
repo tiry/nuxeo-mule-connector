@@ -173,7 +173,7 @@ public class BlobConverters {
         }
 
         String name = blob.getFileName();
-        if (name == null | name.isEmpty()) {
+        if (name == null || name.isEmpty()) {
             name = "blob.bin";
         }
 

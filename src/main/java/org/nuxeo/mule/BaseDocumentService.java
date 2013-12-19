@@ -20,6 +20,7 @@ import org.nuxeo.ecm.automation.client.model.Documents;
 import org.nuxeo.ecm.automation.client.model.OperationInput;
 import org.nuxeo.ecm.automation.client.model.PropertyMap;
 import org.nuxeo.mule.blob.NuxeoBlob;
+import org.nuxeo.mule.mapper.MapUnmangler;
 
 
 /**
@@ -95,7 +96,7 @@ public class BaseDocumentService {
     String docName, @Placement(group = "operation parameters")
     Map<String, Object> properties) throws Exception {
 
-        PropertyMap map = new PropertyMap(properties);
+        PropertyMap map = MapUnmangler.unMangle(properties);
         return docService.createDocument(new DocRef(parentRef), docType,
                 docName, map);
     }
@@ -360,7 +361,7 @@ public class BaseDocumentService {
     public Document update(@Placement(group = "operation parameters")
     String doc, @Placement(group = "operation parameters")
     Map<String, Object> properties) throws Exception {
-        return docService.update(new DocRef(doc), new PropertyMap(properties));
+        return docService.update(new DocRef(doc), MapUnmangler.unMangle(properties));
     }
 
 
@@ -671,7 +672,7 @@ public class BaseDocumentService {
         OperationRequest req = session.newRequest("Context.StartWorkflow").setInput(DocRef.newRef(docRef));
         req.set("Id", workflowId);
         req.set("start", start);
-        req.set("variables", new PropertyMap(wfVars));
+        req.set("variables", MapUnmangler.unMangle(wfVars));
         return (Document) req.execute();
     }
 

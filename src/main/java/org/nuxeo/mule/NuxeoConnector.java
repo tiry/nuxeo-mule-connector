@@ -3,17 +3,11 @@
  */
 package org.nuxeo.mule;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,12 +54,11 @@ import org.nuxeo.ecm.automation.client.model.OperationDocumentation;
 import org.nuxeo.ecm.automation.client.model.OperationDocumentation.Param;
 import org.nuxeo.ecm.automation.client.model.PropertyMap;
 import org.nuxeo.ecm.automation.client.model.RecordSet;
-import org.nuxeo.ecm.automation.client.model.StreamBlob;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
 import org.nuxeo.mule.blob.BlobConverters;
 import org.nuxeo.mule.blob.NuxeoBlob;
-import org.nuxeo.mule.blob.NuxeoFileBlob;
 import org.nuxeo.mule.mapper.Doc2Map;
+import org.nuxeo.mule.mapper.MapUnmangler;
 import org.nuxeo.mule.metadata.MetaDataIntrospector;
 import org.nuxeo.mule.poll.EventPollingClient;
 import org.nuxeo.mule.poll.ListenerConfig;
@@ -468,7 +461,14 @@ public class NuxeoConnector extends BaseDocumentService {
         for (Param param : opDef.getParams()) {
             for (String pname : params.keySet()) {
                 if (pname.equals(param.getName())) {
-                    request.set(pname, params.get(pname));
+                    Object val = params.get("name");
+                    // handle specific cases for properties
+                    if (param.getType().equals("properties")) {
+                      if (val instanceof Map) {
+                          val = MapUnmangler.unMangle((Map<String, Object>)val);
+                      }
+                    }
+                    request.set(pname, val);
                     break;
                 }
             }

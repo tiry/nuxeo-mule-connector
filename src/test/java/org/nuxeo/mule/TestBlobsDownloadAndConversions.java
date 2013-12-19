@@ -69,8 +69,9 @@ public class TestBlobsDownloadAndConversions {
         Assert.assertNotNull(blob);
 
         Assert.assertNotNull(blob.getFileName());
-
+        Assert.assertNotNull(blob.getMimeType());
         Assert.assertEquals("somefile.txt", blob.getFileName());
+        Assert.assertEquals("text/plain", blob.getMimeType());
 
 
         File file = BlobConverters.blobToFile(blob);

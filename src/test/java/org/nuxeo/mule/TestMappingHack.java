@@ -5,7 +5,9 @@ import java.util.Calendar;
 import org.junit.Assert;
 import org.junit.Test;
 import org.nuxeo.ecm.automation.client.model.Blob;
+import org.nuxeo.ecm.automation.client.model.PropertyMap;
 import org.nuxeo.ecm.automation.client.model.StringBlob;
+import org.nuxeo.mule.mapper.MapUnmangler;
 import org.nuxeo.mule.mapper.MuleTranslatedMap;
 
 public class TestMappingHack {
@@ -38,7 +40,6 @@ public class TestMappingHack {
         Assert.assertEquals(blobValue1, nxMap.get("file__content"));
         Assert.assertEquals(arrayValue1, nxMap.get("dc__contributors"));
 
-
         //verify write back
         String titleValue2 = "title2";
         Calendar dateValue2 = Calendar.getInstance();
@@ -48,6 +49,34 @@ public class TestMappingHack {
         nxMap.put("dc__created", dateValue2);
         nxMap.put("file__content", blobValue2);
         nxMap.put("dc__contributors", arrayValue2);
+
+
+        // verify access from prefixed names
+        Assert.assertEquals(titleValue2, nxMap.get("dc:title"));
+        Assert.assertEquals(dateValue2, nxMap.get("dc:created"));
+        Assert.assertEquals(blobValue2, nxMap.get("file:content"));
+        Assert.assertEquals(arrayValue2, nxMap.get("dc:contributors"));
+
+        // verify access from Mule names
+        Assert.assertEquals(titleValue2, nxMap.get("dc__title"));
+        Assert.assertEquals(dateValue2, nxMap.get("dc__created"));
+        Assert.assertEquals(blobValue2, nxMap.get("file__content"));
+        Assert.assertEquals(arrayValue2, nxMap.get("dc__contributors"));
+
+        // check unmangle
+
+        nxMap.put("ecm:type", "type");
+        nxMap.put("ecm:id", "uid");
+
+        PropertyMap map2 = MapUnmangler.unMangle(nxMap);
+
+        Assert.assertTrue(map2.getKeys().contains("dc:title"));
+        Assert.assertTrue(map2.getKeys().contains("dc:created"));
+        Assert.assertTrue(map2.getKeys().contains("file:content"));
+        Assert.assertTrue(map2.getKeys().contains("dc:contributors"));
+
+        Assert.assertFalse(map2.getKeys().contains("ecm:id"));
+
 
 
 
