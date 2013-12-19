@@ -12,6 +12,7 @@ public class NuxeoBlob extends Blob{
     protected final Blob wrappedBlob;
 
     public NuxeoBlob(Blob wrapped) {
+        super(wrapped.getFileName(), wrapped.getMimeType());
         this.wrappedBlob = wrapped;
     }
 

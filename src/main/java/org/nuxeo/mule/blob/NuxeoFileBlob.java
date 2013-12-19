@@ -8,6 +8,7 @@ import org.nuxeo.ecm.automation.client.model.HasFile;
 public class NuxeoFileBlob extends NuxeoBlob implements HasFile {
 
     private static final long serialVersionUID = 1L;
+
     protected FileBlob fileBlob;
 
     public NuxeoFileBlob(FileBlob wrapped) {
