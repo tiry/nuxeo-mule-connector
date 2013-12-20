@@ -6,9 +6,17 @@
 
 [Step 2: Install Mule Nuxeo Connector from update Site](#step-2)   
 
-[Step 3: Create Demo Project](#step3)  
+[Step 3: Create Demo Project](#step-3)  
 
-[Step 4: Add Nuxeo Connector in your flow](#step4)   
+[Step 4: Implement a flow that uploads a file in Nuxeo](#step-4)
+
+[Step 5: Playing with datasense: Exporting some of the repository content in XML](#step-5)
+
+[Step 6: Playing with DataSense: Importing content from a flat file in the repository](#step-6)
+
+[Step 7: Listening to events happening in a Nuxeo instance, from Mule](#step-7)
+
+
 
 [Other Resources](#other)    
 
@@ -88,6 +96,8 @@ Alternatively, you can usee the [update site provided by Nuxeo QA](https://qa.nu
 
 ### Step 4: Implement a flow that uploads a file in Nuxeo
 
+<a name="step-4"></a>
+
 **Goal**: We want to poll a specific folder in the file system so that each time a file is dropped there, it is uploaded in Nuxeo, under the */default-domain/workspaces* folder.	
 
 1. Drop a File endpoint in the middle of the flow editor. This will create a new flow called "DemoFlow1".
@@ -164,6 +174,8 @@ Note: You could also have used the operation "FileManager.Import" so as to creat
 
 ### Step 5: Playing with datasense: Exporting some of the repository content in XML
 
+<a name="step-5"></a>
+
 Nuxeo is compatible with Mule DataSense. Thanks to this feature, Mule Studio automatically fetches your Nuxeo repository schemas and properties definitions. Implementing complex mappings (as complex as a Nuxeo document type can be) is just about pulling some arrows between the two sides of the mapping.
 In the sub-steps below, we show how to export and convert Nuxeo Data in XML , and how to import csv data as Nuxeo Documents. We will select some Note document type in Nuxeo and export in a Invoice domain XML grammar.
 
@@ -220,6 +232,8 @@ In the sub-steps below, we show how to export and convert Nuxeo Data in XML , an
 
 ### Step 6: Playing with DataSense: Importing content from a flat file in the repository
 
+<a name="step-6"></a>
+
 We saw just before how to export content in a flat file, we will know do the contrary, very easily, once again leveraging Mule DataSense support of Nuxeo Mule Connector. We will import the XML file generated before and map it to a Note document type.
 
 1. Create a new empty flow called "ImportingInNuxeo".
@@ -271,6 +285,8 @@ Click on Generate Mapping. You 'll see that all the metadata available on the No
    
    
 ### Step 7: Listening to events happening in a Nuxeo instance, from Mule
+
+<a name="step-7"></a>
 
  The Nuxeo Mule Connector allows to litterally "listen" to a Nuxeo instance, so as to go further in a Mule flow execution only when some specific events happen.
  In this sample, we are going to "listen" a local Nuxeo instance so that each time a document of type File is created, we recreate a File on the demo.nuxeo.com instance with the same binary. This time we will use the operation "Import File" for creating the file (instead of doing "createDocument then SetBlob). For some historical reasons, the corresponding operation requires to have in the automation context the ref of the parent document in which to create the file. Hence the "Groovy" step in the flow construction below.
