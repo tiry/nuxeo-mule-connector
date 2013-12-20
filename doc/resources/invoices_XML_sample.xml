@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8”?>
+<INVOICES> 
+<INVOICE>
+    <CUSTOMER_NAME></CUSTOMER_NAME>
+   <ACCEPTED_PAYMENTS>
+         <CHANNEL/>
+    </ACCEPTED_PAYMENTS>  
+
+    <INVOICE-ID/>
+     <CONTENT/>
+     <TYPE/>
+     <REGULATORY_COUNTRY/>
+     <ACOUNTANCY_CATEGORY/>
+     <AMOUNT/>
+</INVOICE>
+</INVOICES>
