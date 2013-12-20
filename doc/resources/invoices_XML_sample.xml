@@ -1,14 +1,26 @@
-<?xml version="1.0" encoding="UTF-8”?>
 <INVOICES> 
 <INVOICE>
-    <CUSTOMER_NAME></CUSTOMER_NAME>
+    <CUSTOMER_NAME>John Doe</CUSTOMER_NAME>
    <ACCEPTED_PAYMENTS>
-         <CHANNEL/>
-    </ACCEPTED_PAYMENTS>  
-
-    <INVOICE-ID/>
-     <CONTENT/>
-     <TYPE/>
+         <CHANNEL>Credit Card</CHANNEL>
+         <CHANNEL>Debit Card</CHANNEL>
+    </ACCEPTED_PAYMENTS>
+     <INVOICE-ID>89898-7878-Y88978-7878</INVOICE-ID>
+     <CONTENT>Your are invited to contact the Customer Relationship service...</CONTENT>
+     <TYPE> TYPE_OF_INVOICE</TYPE>
+     <REGULATORY_COUNTRY/>
+     <ACOUNTANCY_CATEGORY/>
+     <AMOUNT/>
+</INVOICE>
+<INVOICE>
+    <CUSTOMER_NAME>John CUSIVIER</CUSTOMER_NAME>
+   <ACCEPTED_PAYMENTS>
+         <CHANNEL>Credit Card</CHANNEL>
+          <CHANNEL>Debit Card</CHANNEL>
+    </ACCEPTED_PAYMENTS>
+     <INVOICE-ID>865-7878-Y88978-7878</INVOICE-ID>
+     <CONTENT>Your are invited to contact the Customer Relationship service...</CONTENT>
+     <TYPE> SECOND TYPE OF INVOICE</TYPE>
      <REGULATORY_COUNTRY/>
      <ACOUNTANCY_CATEGORY/>
      <AMOUNT/>
