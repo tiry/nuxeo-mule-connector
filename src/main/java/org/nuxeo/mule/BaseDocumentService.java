@@ -654,10 +654,9 @@ public class BaseDocumentService {
 
         OperationRequest req = session.newRequest("FileManager.Import").setInput(
                 getInput(blobOrDoc));
-
         propagateAutomationContext(inbound, req);
-
-        req.set("overwrite", overwrite);
+        // XXX typo !
+        req.set("overwite", overwrite);
         return (Document) req.execute();
     }
 

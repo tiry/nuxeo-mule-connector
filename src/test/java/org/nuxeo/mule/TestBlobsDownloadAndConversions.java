@@ -81,7 +81,21 @@ public class TestBlobsDownloadAndConversions {
         Assert.assertEquals(5, file.length());
         Assert.assertEquals("somefile.txt", file.getName());
 
+        blob = docService.getBlob(new IdRef(doc.getId()));
+        Assert.assertNotNull(blob);
 
+        Assert.assertNotNull(blob.getFileName());
+        Assert.assertNotNull(blob.getMimeType());
+        Assert.assertEquals("somefile.txt", blob.getFileName());
+        Assert.assertEquals("text/plain", blob.getMimeType());
+
+
+        file = BlobConverters.blobToFile(blob);
+
+        Assert.assertNotNull(file);
+        Assert.assertTrue(file.exists());
+        Assert.assertEquals(5, file.length());
+        Assert.assertEquals("somefile.txt", file.getName());
 
 
     }
