@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="demo">
+    <global-element name="Nuxeo" type="http://www.mulesoft.org/schema/mule/nuxeo/config" entity-id="Nuxeo#1">
+        <properties>
+            <property name="port"/>
+            <property name="username" value="Administrator"/>
+            <property name="protocol"/>
+            <property name="defaultSchemas" value="dublincore,common,file,files,note"/>
+            <property name="name" value="Nuxeo"/>
+            <property name="auxiliary;metauseMetaData" value="true"/>
+            <property name="pollingInterval"/>
+            <property name="contextPath"/>
+            <property name="serverName"/>
+            <property name="password" value="Administrator"/>
+            <property name="auxiliary;index" value="1"/>
+            <property-collection name="@http://www.mulesoft.org/schema/mule/nuxeo/connection-pooling-profile;0">
+                <property name="exhaustedAction" value="WHEN_EXHAUSTED_GROW"/>
+                <property name="isProcessed$$$$ " value="true"/>
+                <property name="auxiliary;wrapIn" value="2"/>
+                <property name="auxiliary;index" value="2"/>
+                <property name="initialisationPolicy" value="INITIALISE_ONE"/>
+            </property-collection>
+        </properties>
+    </global-element>
+    <flow SubFlow="false" name="demoFlow1" type="http://www.mulesoft.org/schema/mule/core/flow" entity-id="8f8158c5-3fd1-4b5f-b59b-a84321c193f4">
+        <properties>
+            <property name="initialState"/>
+            <property name="processingStrategy2"/>
+            <property name="processingStrategy"/>
+            <property name="bussinessEventsLabel"/>
+            <property name="tracking:enable-default-events"/>
+            <property name="auxiliary;index" value="3"/>
+        </properties>
+        <lane hadOnlyOneElement="false" index="0" isChoiceOtherwiseLane="false" entity-id="compartment-lane#1">
+            <graphicalData x="0" y="0" width="0" height="0"/>
+            <endpoint direction="Inbound" message-exchange-pattern="OneWay" name="File polling" type="http://www.mulesoft.org/schema/mule/file/endpoint" entity-id="File#1">
+                <graphicalData x="21" y="199" width="73" height="67"/>
+                <properties>
+                    <property name="reverseOrder"/>
+                    <property name="moveToPattern"/>
+                    <property name="pollingFrequency"/>
+                    <property name="businessEventsLabel"/>
+                    <property name="comparator"/>
+                    <property name="disableTransportTransformer"/>
+                    <property name="exchange-pattern" value="one-way"/>
+                    <property name="tracking:enable-default-events"/>
+                    <property name="ref"/>
+                    <property name="transformer-refs"/>
+                    <property name="moveToDirectory" value="/Users/aescaffre/Documents/imported"/>
+                    <property name="address"/>
+                    <property name="fileAge"/>
+                    <property name="encoding"/>
+                    <property name="path" value="/Users/aescaffre/Documents/toImport"/>
+                    <property name="outputPattern"/>
+                    <property name="responseTimeout" value="10000"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="4"/>
+                    <property name="connector-ref"/>
+                </properties>
+            </endpoint>
+            <pattern name="File To Blob" type="http://www.mulesoft.org/schema/mule/nuxeo/nuxeo-transformer" entity-id="Nuxeo#2">
+                <graphicalData x="154" y="199" width="77" height="67"/>
+                <properties>
+                    <property name="returnClass"/>
+                    <property name="ignoreBadInput"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/nuxeo/file-to-blob"/>
+                    <property name="encoding"/>
+                    <property name="mimeType"/>
+                    <property name="auxiliary;index" value="5"/>
+                </properties>
+            </pattern>
+            <pattern name="Set as FileToUpload" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#1">
+                <graphicalData x="291" y="199" width="119" height="67"/>
+                <properties>
+                    <property name="variableName" value="FileToUpload"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+                    <property name="value" value="#[payload]"/>
+                    <property name="auxiliary;index" value="6"/>
+                </properties>
+            </pattern>
+            <pattern name="Create document" type="http://www.mulesoft.org/schema/mule/nuxeo/nuxeo-connector" entity-id="Nuxeo#3">
+                <graphicalData x="470" y="199" width="106" height="67"/>
+                <properties>
+                    <property name=""/>
+                    <property name="parentRef" value="/default-domain/workspaces"/>
+                    <property name="docName" value="#[payload.file.name]"/>
+                    <property name="username"/>
+                    <property name="docType" value="File"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/nuxeo/create-document"/>
+                    <property name="config-ref" value="Nuxeo"/>
+                    <property name="password"/>
+                    <property name="auxiliary;index" value="7"/>
+                    <property-collection name="@http://www.mulesoft.org/schema/mule/nuxeo/create-document-propertiess;0">
+                        <property name="isProcessed$$$$ " value="true"/>
+                        <property name="auxiliary;wrapIn" value="8"/>
+                        <property name="auxiliary;index" value="8"/>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/nuxeo/create-document-properties;1">
+                            <property name="value" value="#[payload.file.name]"/>
+                            <property name="isProcessed$$$$ " value="true"/>
+                            <property name="auxiliary;wrapIn" value="9"/>
+                            <property name="auxiliary;index" value="9"/>
+                            <property name="key" value="dc:title"/>
+                        </property-collection>
+                        <property-collection name="@http://www.mulesoft.org/schema/mule/nuxeo/create-document-properties;2">
+                            <property name="value" value="A sample file imported using Mule"/>
+                            <property name="isProcessed$$$$ " value="true"/>
+                            <property name="auxiliary;wrapIn" value="10"/>
+                            <property name="auxiliary;index" value="10"/>
+                            <property name="key" value="dc:description"/>
+                        </property-collection>
+                    </property-collection>
+                </properties>
+            </pattern>
+            <pattern name="Save Document id" type="http://www.mulesoft.org/schema/mule/core/variable-transformer" entity-id="Variable#2">
+                <graphicalData x="636" y="199" width="110" height="67"/>
+                <properties>
+                    <property name="variableName" value="FileDocumentId"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/core/set-variable"/>
+                    <property name="value" value="#[payload.id]"/>
+                    <property name="auxiliary;index" value="11"/>
+                </properties>
+            </pattern>
+            <pattern name="Set the file as Payload " type="http://www.mulesoft.org/schema/mule/core/set-payload" entity-id="15e4fe59-fc1a-48a2-bdf3-973cb6fda208">
+                <graphicalData x="806" y="199" width="134" height="67"/>
+                <properties>
+                    <property name="updated"/>
+                    <property name="value" value="#[FileToUpload]"/>
+                </properties>
+                <description></description>
+            </pattern>
+            <pattern name="Upload" type="http://www.mulesoft.org/schema/mule/nuxeo/nuxeo-connector" entity-id="e998eff8-c7b3-4aea-ae12-a3a870fb6d8f">
+                <graphicalData x="0" y="0" width="0" height="0"/>
+                <properties>
+                    <property name="" value=""/>
+                    <property name="username" value=""/>
+                    <property name="blob-ref" value="#[payload]"/>
+                    <property name="updated"/>
+                    <property name="org.mule.tooling.ui.modules.core.widgets.meta.ModeAttribute" value="http://www.mulesoft.org/schema/mule/nuxeo/set-blob"/>
+                    <property name="doc" value="#[FileDocumentId]"/>
+                    <property name="config-ref" value="Nuxeo"/>
+                    <property name="password" value=""/>
+                    <property name="xpath" value="file:content"/>
+                </properties>
+                <description></description>
+            </pattern>
+        </lane>
+    </flow>
+    <description></description>
+</mule-configuration>
